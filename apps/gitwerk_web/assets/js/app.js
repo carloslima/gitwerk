@@ -25,5 +25,5 @@ import Elm from './main';
 const elmDiv = document.querySelector('#elm_target');
 
 if (elmDiv) {
-      Elm.Main.embed(elmDiv);
+    var app = Elm.Main.embed(elmDiv, localStorage.session || null);
 }
