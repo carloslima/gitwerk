@@ -28,9 +28,9 @@ defmodule Gitwerk.Web.ConnCase do
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Gitwerk.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(GitwerkData.Repo)
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Gitwerk.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(GitwerkData.Repo, {:shared, self()})
     end
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end

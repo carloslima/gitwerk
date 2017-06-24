@@ -1,6 +1,6 @@
-defmodule Gitwerk.Application do
+defmodule GitwerkData.Application do
   @moduledoc """
-  The Gitwerk Application Service.
+  The GitwerkData Application Service.
 
   The gitwerk system business domain lives in this application.
 
@@ -13,7 +13,7 @@ defmodule Gitwerk.Application do
     import Supervisor.Spec, warn: false
 
     Supervisor.start_link([
-      worker(Gitwerk.Repo, []),
-    ], strategy: :one_for_one, name: Gitwerk.Supervisor)
+      worker(GitwerkData.Repo, []),
+    ], strategy: :one_for_one, name: GitwerkData.Supervisor)
   end
 end

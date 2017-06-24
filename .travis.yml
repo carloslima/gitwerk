@@ -1,9 +1,16 @@
 sudo: false
 
+language: elixir
+elixir: 1.4.0
+
 cache:
   directories:
     - tests/elm-stuff/build-artifacts
     - sysconfcpus
+    - deps
+
+addons:
+  - postgresql: "9.5"
 
 os:
   - linux
@@ -37,7 +44,14 @@ install:
   - travis_retry elm-package install --yes
   - cd tests
   - travis_retry elm-package install --yes
-  - cd ..
+  - cd ../../../../
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
 
+before_script:
+  - cp apps/gitwerk_data/config/travis.exs apps/gitwerk_data/config/test.exs
 script:
+  - mix test
+  - cd apps/gitwerk_web/assets/
   - elm test

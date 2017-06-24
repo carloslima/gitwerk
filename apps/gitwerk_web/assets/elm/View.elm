@@ -5,6 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy2)
 import Route exposing (Route)
 import Util exposing ((=>))
+import User.UserData exposing (User, usernameToString)
 
 
 type ActivePage
@@ -14,40 +15,47 @@ type ActivePage
     | Join
 
 
-frame : ActivePage -> Html msg -> Html msg
-frame page contect =
+frame : Bool -> Maybe User -> ActivePage -> Html msg -> Html msg
+frame isLoading user page content =
     div [ class "page-frame" ]
-        [ viewHeader page
-        , contect
+        [ viewHeader page user isLoading
+        , content
         , viewFooter
         ]
 
 
-viewHeader : ActivePage -> Html msg
-viewHeader page =
+viewHeader : ActivePage -> Maybe User -> Bool -> Html msg
+viewHeader page user isLoading =
     nav [ class "navbar navbar-toggleable-md navbar-light bg-faded" ]
         [ a [ class "navbar-brand", Route.href Route.Home ]
             [ text "gitwerk" ]
         , div [ class "collapse navbar-collapse" ]
             [ ul [ class "navbar-nav mr-auto" ] <|
-                lazy2 viewIf False spinner
+                lazy2 viewIf isLoading spinner
                     :: (navbarLink (page == Home) Route.Home [ text "Home" ])
-                    :: viewSignIn page
+                    :: viewSignIn page user
             ]
         ]
 
 
-viewSignIn : ActivePage -> List (Html msg)
-viewSignIn page =
-    [ navbarLink (page == Login) Route.Login [ text "Sign in" ]
-    , navbarLink (page == Join) Route.Join [ text "Sign up" ]
-    ]
+viewSignIn : ActivePage -> Maybe User -> List (Html msg)
+viewSignIn page user =
+    case user of
+        Nothing ->
+            [ navbarLink (page == Login) Route.Login [ text "Login" ]
+            , navbarLink (page == Join) Route.Join [ text "Join" ]
+            ]
+
+        Just user ->
+            [ navbarLink False Route.Home [ text ("welcome " ++ (usernameToString user.username))]
+            , navbarLink True Route.Logout [ text "Sign out" ]
+            ]
 
 
 spinner : Html msg
 spinner =
-    li [ class "sk-three-bounce", style ([ "float" => "left", "margin" => "8px" ]) ]
-        [ div [ class "sk-child sk-bounce1" ] []
+    li [ class "fa fa-spinner", style ([ "float" => "left", "margin" => "8px" ]) ]
+        [ div [ class "glyphicon glyphicon-refresh" ] []
         , div [ class "sk-child sk-bounce2" ] []
         , div [ class "sk-child sk-bounce3" ] []
         ]

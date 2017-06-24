@@ -2,6 +2,7 @@ module Home.MainPage exposing (initialModel, Model, view, Msg, update)
 
 import Html exposing (..)
 import Route
+import User.SessionData exposing (Session)
 
 
 type alias Model =
@@ -13,8 +14,8 @@ initialModel =
     {}
 
 
-view : Model -> Html.Html Msg
-view model =
+view : Session -> Model -> Html.Html Msg
+view user model =
     Html.div []
         [ Html.text "Home Page"
         ]

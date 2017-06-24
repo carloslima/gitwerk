@@ -4,7 +4,7 @@ import Test exposing (..)
 import Expect
 import Fuzz exposing (list, int, string)
 import Main
-import User.UserData as User exposing (User, AuthToken, Username)
+import User.UserData as User exposing (User, JWTAuthToken, Username)
 import Json.Decode
 import Json.Encode
 
@@ -17,11 +17,11 @@ suite =
                 let
                     json =
                         Json.Encode.string """
-                    {"username": "sam", "token": "UluC5cgCy2f7KFJVeUIBYkvZE04=", "email" : "sam@example.com"}
+                    {"username": "sam", "jwt_token": "UluC5cgCy2f7KFJVeUIBYkvZE04=", "email" : "sam@example.com"}
                     """
 
                     token =
-                        User.AuthToken "UluC5cgCy2f7KFJVeUIBYkvZE04="
+                        User.JWTAuthToken "UluC5cgCy2f7KFJVeUIBYkvZE04="
 
                     username =
                         User.Username "sam"

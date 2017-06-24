@@ -11,6 +11,7 @@ type Route
     = Home
     | Login
     | Join
+    | Logout
 
 
 route : Parser (Route -> a) a
@@ -19,6 +20,7 @@ route =
         [ Url.map Home (s "")
         , Url.map Login (s "login")
         , Url.map Join (s "join")
+        , Url.map Logout (s "logout")
         ]
 
 
@@ -35,6 +37,9 @@ routeToString page =
 
                 Join ->
                     [ "join" ]
+
+                Logout ->
+                    [ "logout" ]
     in
         "#/" ++ (String.join "/" pieces)
 
@@ -55,11 +60,7 @@ modifyUrl =
 
 fromLocation : Location -> Maybe Route
 fromLocation location =
-    let
-        _ =
-            Debug.log "fromLocation: " location
-    in
-        if String.isEmpty location.hash then
-            Just Home
-        else
-            parseHash route location
+    if String.isEmpty location.hash then
+        Just Home
+    else
+        parseHash route location

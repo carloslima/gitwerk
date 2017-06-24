@@ -1,5 +1,5 @@
-defmodule Gitwerk.Repo do
-  use Ecto.Repo, otp_app: :gitwerk
+defmodule GitwerkData.Repo do
+  use Ecto.Repo, otp_app: :gitwerk_data
 
   @doc """
   Dynamically loads the repository url from the

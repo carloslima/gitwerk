@@ -10,6 +10,8 @@ import User.SignupPage
 import Home.MainPage
 import User.SessionData exposing (Session)
 import User.UserData as User exposing (User)
+import Helpers.Ports as Ports
+import Util exposing ((=>))
 import Debug
 import View
 
@@ -42,6 +44,7 @@ type Msg
     | LoginMsg User.LoginPage.Msg
     | JoinMsg User.SignupPage.Msg
     | HomeMsg Home.MainPage.Msg
+    | SetUser (Maybe User)
 
 
 initialPage : Page
@@ -53,17 +56,17 @@ view : Model -> Html.Html Msg
 view model =
     case model.pageState of
         Loaded page ->
-            viewPage page
+            viewPage model.session False page
 
         TransitioningFrom page ->
-            viewPage page
+            viewPage model.session True page
 
 
-viewPage : Page -> Html.Html Msg
-viewPage page =
+viewPage : Session -> Bool -> Page -> Html.Html Msg
+viewPage session isLoading page =
     let
         frame =
-            View.frame
+            View.frame isLoading session.user
     in
         case page of
             NotFound ->
@@ -73,7 +76,7 @@ viewPage page =
                 Html.text "Blank"
 
             Login subModel ->
-                User.LoginPage.view subModel
+                User.LoginPage.view session subModel
                     |> frame View.Login
                     |> Html.map LoginMsg
 
@@ -83,7 +86,7 @@ viewPage page =
                     |> Html.map JoinMsg
 
             Home subModel ->
-                Home.MainPage.view subModel
+                Home.MainPage.view session subModel
                     |> frame View.Home
                     |> Html.map HomeMsg
 
@@ -106,6 +109,9 @@ getPage pageState =
 updatePage : Page -> Msg -> Model -> ( Model, Cmd Msg )
 updatePage page msg model =
     let
+        session =
+            model.session
+
         toPage toModel toMsg subUpdate subMsg subModel =
             let
                 ( newModel, newCmd ) =
@@ -113,7 +119,7 @@ updatePage page msg model =
             in
                 ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
     in
-        case Debug.log" updatePage: " ( msg, page ) of
+        case ( msg, page ) of
             ( SetRoute route, _ ) ->
                 setRoute route model
 
@@ -123,12 +129,41 @@ updatePage page msg model =
                         User.LoginPage.update subMsg subModel
 
                     newModel =
-                        model
+                        case msgFromPage of
+                            User.LoginPage.NoOp ->
+                                model
+
+                            User.LoginPage.SetUser user ->
+                                let
+                                    session =
+                                        model.session
+                                in
+                                    { model | session = { user = Just user } }
                 in
-                    ( { newModel | pageState = Loaded (Login pageModel) }, Cmd.map LoginMsg cmd )
+                    { newModel | pageState = Loaded (Login pageModel) }
+                        => Cmd.map LoginMsg cmd
+
+            ( JoinMsg subMsg, Join subModel ) ->
+                let
+                    ( ( pageModel, cmd ), msgFromPage ) =
+                        User.SignupPage.update subMsg subModel
+
+                    newModel =
+                        case msgFromPage of
+                            User.SignupPage.NoOp ->
+                                model
+
+                            User.SignupPage.SetUser user ->
+                                let
+                                    session =
+                                        model.session
+                                in
+                                    { model | session = { user = Just user } }
+                in
+                    ( { newModel | pageState = Loaded (Join pageModel) }, Cmd.map JoinMsg cmd )
 
             ( _, _ ) ->
-                ( model, Cmd.none )
+                Debug.log "unhandled event" ( model, Cmd.none )
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -137,7 +172,7 @@ setRoute maybeRoute model =
         transition toMsg task =
             ( { model | pageState = TransitioningFrom (getPage model.pageState) }, Task.attempt toMsg task )
     in
-        case Debug.log "setRoute: " maybeRoute of
+        case maybeRoute of
             Nothing ->
                 ( { model | pageState = Loaded NotFound }, Cmd.none )
 
@@ -150,9 +185,33 @@ setRoute maybeRoute model =
             Just (Route.Join) ->
                 ( { model | pageState = Loaded (Join User.SignupPage.initialModel) }, Cmd.none )
 
+            Just (Route.Logout) ->
+                let
+                    session =
+                        model.session
+                in
+                    { model | session = { session | user = Nothing } }
+                        => Cmd.batch
+                            [ Ports.storeSession Nothing
+                            , Route.modifyUrl Route.Login
+                            ]
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
+    Sub.batch
+        [ pageSubscriptions (getPage model.pageState)
+        , Sub.map SetUser sessionChange
+        ]
+
+
+sessionChange : Sub (Maybe User)
+sessionChange =
+    Ports.onSessionChange (Decode.decodeValue User.decoder >> Result.toMaybe)
+
+
+pageSubscriptions : Page -> Sub Msg
+pageSubscriptions page =
     Sub.none
 
 
