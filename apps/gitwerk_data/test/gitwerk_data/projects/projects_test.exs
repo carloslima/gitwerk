@@ -7,8 +7,8 @@ defmodule GitwerkData.ProjectsTest do
   describe "repositories" do
     alias GitwerkData.Projects.Repository
 
-    @valid_attrs %{name: "some name", privacy: :private, user_id: nil}
-    @update_attrs %{name: "some updated name", privacy: :public}
+    @valid_attrs %{name: "repo-name", privacy: :private, user_id: nil}
+    @update_attrs %{name: "repo_updated_name", privacy: :public}
     @invalid_attrs %{name: nil, privacy: nil, user_id: nil}
 
     def user_fixture(attrs \\ %{}) do
