@@ -10,15 +10,6 @@ defmodule GitwerkData.AccountsTest do
     @update_attrs %{email: "some@updated.com", password_hash: "some updated password_hash", username: "some_updated_username"}
     @invalid_attrs %{email: nil, password_hash: nil, username: nil}
 
-    def user_fixture(attrs \\ %{}) do
-      {:ok, user} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_user()
-
-      user
-    end
-
     test "only accept valid username" do
       {:error, changeset} = @valid_attrs
                              |> Map.put(:username, "my invalid user name")

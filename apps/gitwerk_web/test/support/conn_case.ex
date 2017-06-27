@@ -21,6 +21,7 @@ defmodule Gitwerk.Web.ConnCase do
       use Phoenix.ConnTest
       import Gitwerk.Web.Router.Helpers
 
+      import Gitwerk.Web.TestHelpers
       # The default endpoint for testing
       @endpoint Gitwerk.Web.Endpoint
     end

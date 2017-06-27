@@ -6,7 +6,22 @@ defmodule GitwerkData.Projects do
   import Ecto.Query, warn: false
   alias GitwerkData.Repo
 
+  alias GitwerkData.Projects.Git
   alias GitwerkData.Projects.Repository
+  alias GitwerkData.Accounts.User
+
+  @doc """
+  Creates project with all required resources
+  """
+  def create(%User{} = user, attrs \\ %{}) do
+    attrs = attrs |> Map.put(:user_id, user.id)
+    with {:ok, repo} <- create_repository(attrs),
+         {:ok, git_pid} <- Git.create(user, repo) do
+           {:ok, %{repo| repo: git_pid}}
+    else
+     error -> error
+     end
+  end
 
   @doc """
   Returns the list of repositories.

@@ -18,6 +18,7 @@ defmodule GitwerkData.DataCase do
     quote do
       alias GitwerkData.Repo
 
+      import GitwerkData.TestHelpers
       import Ecto
       import Ecto.Changeset
       import Ecto.Query

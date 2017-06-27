@@ -34,6 +34,7 @@ defmodule GitwerkData.Mixfile do
     [
       {:postgrex, ">= 0.0.0"},
       {:ecto, "~> 2.1"},
+      {:geef, github: "carlosmn/geef"},
       {:ecto_enum, "~> 1.0"},
     ]
   end

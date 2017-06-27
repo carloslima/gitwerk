@@ -12,6 +12,7 @@ defmodule GitwerkData.Projects.Repository do
     field :privacy, EnumRepositoryPrivacies
     field :user_id, Ecto.UUID
 
+    field :repo, :any, virtual: true
     timestamps()
   end
 

@@ -11,3 +11,6 @@ config :gitwerk_data, GitwerkData.Repo,
 
 config :comeonin, :bcrypt_log_rounds, 4
 config :comeonin, :pbkdf2_rounds, 1
+
+config :gitwerk_data, GitwerkData.Projects.Git,
+  git_home_dir:  Path.join([Path.expand("."), "priv", "test"])

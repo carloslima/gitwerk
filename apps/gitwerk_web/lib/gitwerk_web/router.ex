@@ -17,6 +17,7 @@ defmodule Gitwerk.Web.Router do
     pipe_through :api
     resources "/users", UserController, except: [:new, :edit]
     resources "/sessions", SessionController, except: [:new, :delete]
+    resources "/repository", RepositoryController, except: [:new]
   end
 
   scope "/", Gitwerk.Web do

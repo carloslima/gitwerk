@@ -20,6 +20,7 @@ defmodule Gitwerk.Web.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
 
+      import Gitwerk.Web.TestHelpers
       # The default endpoint for testing
       @endpoint Gitwerk.Web.Endpoint
     end

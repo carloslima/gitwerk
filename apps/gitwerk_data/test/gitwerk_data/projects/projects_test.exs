@@ -2,7 +2,6 @@ defmodule GitwerkData.ProjectsTest do
   use GitwerkData.DataCase
 
   alias GitwerkData.Projects
-  alias GitwerkData.Accounts
 
   describe "repositories" do
     alias GitwerkData.Projects.Repository
@@ -11,23 +10,11 @@ defmodule GitwerkData.ProjectsTest do
     @update_attrs %{name: "repo_updated_name", privacy: :public}
     @invalid_attrs %{name: nil, privacy: nil, user_id: nil}
 
-    def user_fixture(attrs \\ %{}) do
-      valid_user = %{email: "some@email.com", password: "some password_hash", username: "some_username"}
-      {:ok, user} =
-        attrs
-        |> Enum.into(valid_user)
-        |> Accounts.create_user()
-
-      user
-    end
-
-    def repository_fixture(attrs \\ %{}) do
-      {:ok, repository} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Projects.create_repository()
-
-      repository
+    test "create/1 project with necessary resources" do
+      username = Base.encode16(:crypto.strong_rand_bytes(9))
+      user = user_fixture(username: username)
+      {:ok, repo} = Projects.create(user, @valid_attrs)
+      assert repo.repo
     end
 
     test "list_repositories/0 returns all repositories" do
@@ -45,7 +32,7 @@ defmodule GitwerkData.ProjectsTest do
     test "create_repository/1 with valid data creates a repository" do
       user = user_fixture()
       assert {:ok, %Repository{} = repository} = Projects.create_repository(%{@valid_attrs | user_id: user.id})
-      assert repository.name == "some name"
+      assert repository.name == "repo-name"
       assert repository.privacy == :private
       assert repository.user_id == user.id
     end
@@ -59,7 +46,7 @@ defmodule GitwerkData.ProjectsTest do
       repository = repository_fixture(user_id: user.id)
       assert {:ok, repository} = Projects.update_repository(repository, @update_attrs)
       assert %Repository{} = repository
-      assert repository.name == "some updated name"
+      assert repository.name == "repo_updated_name"
       assert repository.privacy == :public
       assert repository.user_id == user.id
     end
