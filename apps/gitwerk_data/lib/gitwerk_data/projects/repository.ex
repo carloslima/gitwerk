@@ -19,10 +19,31 @@ defmodule GitwerkData.Projects.Repository do
   @doc false
   def changeset(%Repository{} = repo, attrs) do
     repo
-    |> cast(attrs, [:name, :user_id, :privacy])
+    |> force_cast(attrs, [:name, :user_id, :privacy])
     |> validate_required([:name, :user_id, :privacy])
     |> validate_format(:name, ~r/^[a-z0-9_-]*$/)
     |> foreign_key_constraint(:user_id)
+  end
+
+  def force_cast(repo, attrs, allowed) do
+    to_atom_value = fn
+      {k, v} when is_binary(k) ->
+        {to_atom_if_possible(k), v}
+      {k, v} ->
+        {k, v}
+    end
+    attrs = attrs
+            |> Enum.map(&(to_atom_value.(&1)))
+            |> Enum.into(%{})
+    cast(repo, attrs, allowed)
+  end
+
+  defp to_atom_if_possible(string) do
+    try do
+      String.to_existing_atom(string)
+    rescue
+      _ -> string
+    end
   end
 end
 
