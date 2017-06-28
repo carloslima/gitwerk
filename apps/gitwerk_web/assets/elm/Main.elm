@@ -8,6 +8,7 @@ import Task
 import User.LoginPage
 import User.SignupPage
 import Home.MainPage
+import Project.RepositoryPage
 import User.SessionData exposing (Session)
 import User.UserData as User exposing (User)
 import Helpers.Ports as Ports
@@ -22,6 +23,7 @@ type Page
     | Login User.LoginPage.Model
     | Join User.SignupPage.Model
     | Home Home.MainPage.Model
+    | Project Project.RepositoryPage.Model
 
 
 type PageState
@@ -44,6 +46,7 @@ type Msg
     | LoginMsg User.LoginPage.Msg
     | JoinMsg User.SignupPage.Msg
     | HomeMsg Home.MainPage.Msg
+    | ProjectMsg Project.RepositoryPage.Msg
     | SetUser (Maybe User)
 
 
@@ -89,6 +92,11 @@ viewPage session isLoading page =
                 Home.MainPage.view session subModel
                     |> frame View.Home
                     |> Html.map HomeMsg
+
+            Project subModel ->
+                Project.RepositoryPage.view subModel
+                    |> frame View.Home
+                    |> Html.map ProjectMsg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -197,8 +205,7 @@ setRoute maybeRoute model =
                             ]
 
             Just (Route.NewRepository) ->
-                model
-                    => Cmd.none
+                ( { model | pageState = Loaded (Project Project.RepositoryPage.initNew) }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
