@@ -23,7 +23,15 @@ defmodule Gitwerk.Web.TestHelpers do
     repository
   end
 
+  def conn_with_auth(conn, user) do
+    new_conn = Guardian.Plug.api_sign_in(conn, user)
+    jwt_token = Guardian.Plug.current_token(new_conn)
+    conn
+    |> Plug.Conn.put_req_header("authorization", "Bearer #{jwt_token}")
+  end
+
   defp rand_str do
     Base.encode16(:crypto.strong_rand_bytes(9))
+    |> String.downcase
   end
 end

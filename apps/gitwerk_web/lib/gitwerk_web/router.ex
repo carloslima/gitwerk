@@ -13,10 +13,28 @@ defmodule Gitwerk.Web.Router do
     plug :accepts, ["json"]
   end
 
+
+  pipeline :api_optional_auth do
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource
+  end
+
+  pipeline :api_authenticated do
+    plug Guardian.Plug.VerifyHeader, realm: "Bearer"
+    plug Guardian.Plug.LoadResource
+    plug Guardian.Plug.EnsureAuthenticated, handler: Gitwerk.Web.AuthErrorHandler
+    #plug DeveloperCloud.CurrentUserPlug
+  end
+
   scope "/api/v1", Gitwerk.Web do
-    pipe_through :api
-    resources "/users", UserController, except: [:new, :edit]
+    pipe_through [:api, :api_optional_auth]
     resources "/sessions", SessionController, except: [:new, :delete]
+    resources "/users", UserController, only: [:create, :show] do
+      resources "/repository", RepositoryController, param: "repository_name", only: [:show]
+    end
+  end
+  scope "/api/v1", Gitwerk.Web do
+    pipe_through [:api, :api_authenticated]
     resources "/repository", RepositoryController, except: [:new]
   end
 

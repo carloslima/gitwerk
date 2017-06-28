@@ -37,6 +37,8 @@ defmodule GitwerkData.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user_by!(condition), do: Repo.get_by!(User, condition)
+
   @doc """
     Gets a user if password matches
   """
@@ -111,4 +113,3 @@ defmodule GitwerkData.Accounts do
     User.changeset(user, %{})
   end
 end
-
