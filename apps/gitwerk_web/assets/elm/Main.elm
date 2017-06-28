@@ -196,6 +196,10 @@ setRoute maybeRoute model =
                             , Route.modifyUrl Route.Login
                             ]
 
+            Just (Route.NewRepository) ->
+                model
+                    => Cmd.none
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =

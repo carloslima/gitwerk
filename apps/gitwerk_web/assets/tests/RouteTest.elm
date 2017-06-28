@@ -18,4 +18,7 @@ suite =
         , test "Login route" <|
             \_ ->
                 Expect.equal (Html.Attributes.href "#/login") (Route.href Route.Login)
+        , test "create repo" <|
+            \_ ->
+                Expect.equal (Html.Attributes.href "#/repo") (Route.href Route.NewRepository)
         ]

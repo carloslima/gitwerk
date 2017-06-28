@@ -12,6 +12,7 @@ type Route
     | Login
     | Join
     | Logout
+    | NewRepository
 
 
 route : Parser (Route -> a) a
@@ -21,6 +22,7 @@ route =
         , Url.map Login (s "login")
         , Url.map Join (s "join")
         , Url.map Logout (s "logout")
+        , Url.map NewRepository (s "repo")
         ]
 
 
@@ -40,6 +42,9 @@ routeToString page =
 
                 Logout ->
                     [ "logout" ]
+
+                NewRepository ->
+                    [ "repo" ]
     in
         "#/" ++ (String.join "/" pieces)
 
