@@ -18,7 +18,7 @@ import Debug
 
 
 type alias Model =
-    { errors : List Error
+    { errors : List (String, String)
     , username : String
     , email : String
     , password : String
@@ -130,7 +130,7 @@ update msg model =
             let
                 errorMessages = ErrorsData.httpErrorToList "registration" error errorsDecoder
             in
-                { model | errors = List.map (\errorMessage -> Form => errorMessage) errorMessages }
+                { model | errors = List.map (\errorMessage -> "Form" => errorMessage) errorMessages }
                     => Cmd.none
                     => NoOp
 

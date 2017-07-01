@@ -5,6 +5,7 @@ import Navigation exposing (Location)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Debug
+import UrlParser as Url exposing ((</>))
 
 
 type Route

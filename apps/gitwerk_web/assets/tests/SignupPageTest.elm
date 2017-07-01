@@ -38,7 +38,7 @@ suite =
                         SignupPage.update msg model
 
                     expected_model =
-                        (SignupPage.Model [ ( SignupPage.Form, "email has already been taken" ) ] "" "" "")
+                        (SignupPage.Model [ ( "Form", "email has already been taken" ) ] "" "" "")
                 in
                     Expect.equal update_result ( ( expected_model, Cmd.none ), SignupPage.NoOp )
         , test "handles other errors" <|
@@ -57,7 +57,7 @@ suite =
                         SignupPage.update msg model
 
                     expected_model =
-                        (SignupPage.Model [ ( SignupPage.Form, "unable to process registration" ) ] "" "" "")
+                        (SignupPage.Model [ ( "Form", "unable to process registration" ) ] "" "" "")
                 in
                     Expect.equal update_result ( ( expected_model, Cmd.none ), SignupPage.NoOp )
         ]

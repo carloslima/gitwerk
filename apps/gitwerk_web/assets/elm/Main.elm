@@ -94,7 +94,7 @@ viewPage session isLoading page =
                     |> Html.map HomeMsg
 
             Project subModel ->
-                Project.RepositoryPage.view subModel
+                Project.RepositoryPage.view session subModel
                     |> frame View.Home
                     |> Html.map ProjectMsg
 
@@ -170,6 +170,8 @@ updatePage page msg model =
                 in
                     ( { newModel | pageState = Loaded (Join pageModel) }, Cmd.map JoinMsg cmd )
 
+            ( ProjectMsg subMsg, Project subModel) ->
+                toPage Project ProjectMsg (Project.RepositoryPage.update model.session) subMsg subModel
             ( _, _ ) ->
                 Debug.log "unhandled event" ( model, Cmd.none )
 

@@ -10,12 +10,8 @@ import Util exposing ((=>))
 type alias User =
     { email : String
     , token : JWTAuthToken
-    , username : Username
+    , username : String
     }
-
-
-type Username
-    = Username String
 
 
 type JWTAuthToken
@@ -33,12 +29,7 @@ decoder =
     decode User
         |> required "email" Decode.string
         |> required "jwt_token" authTokenDecoder
-        |> required "username" usernameDecoder
-
-
-usernameDecoder : Decoder Username
-usernameDecoder =
-    Decode.map Username Decode.string
+        |> required "username" Decode.string
 
 
 decodeUserFromJson : Value -> Maybe User
@@ -53,17 +44,13 @@ encode user =
     Encode.object
         [ "email" => Encode.string user.email
         , "jwt_token" => encodeJWTAuthtoken user.token
-        , "username" => encodeUsername user.username
+        , "username" => Encode.string user.username
         ]
-
-encodeUsername : Username -> Value
-encodeUsername (Username username) =
-    Encode.string username
 
 encodeJWTAuthtoken : JWTAuthToken -> Value
 encodeJWTAuthtoken (JWTAuthToken token) =
     Encode.string token
 
-usernameToString : Username -> String
-usernameToString (Username username) =
+usernameToString : String -> String
+usernameToString (username) =
         username

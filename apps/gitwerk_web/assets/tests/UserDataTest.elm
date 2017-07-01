@@ -4,7 +4,7 @@ import Test exposing (..)
 import Expect
 import Fuzz exposing (list, int, string)
 import Main
-import User.UserData as User exposing (User, JWTAuthToken, Username)
+import User.UserData as User exposing (User, JWTAuthToken)
 import Json.Decode
 import Json.Encode
 
@@ -23,8 +23,7 @@ suite =
                     token =
                         User.JWTAuthToken "UluC5cgCy2f7KFJVeUIBYkvZE04="
 
-                    username =
-                        User.Username "sam"
+                    username = "sam"
 
                     user =
                         User "sam@example.com" token username
