@@ -16,6 +16,7 @@ import Project.RepositoryData exposing (Repository)
 import Project.RepositoryRequest as RepositoryRequest
 import Helpers.Request.ErrorsData as ErrorsData
 import Util exposing ((=>))
+import Route
 
 
 type alias Model =
@@ -159,9 +160,9 @@ update session msg model =
                 { model | errors = List.map (\errorMessage -> "Form" => errorMessage) errorMessages }
                     => Cmd.none
 
-        _ ->
+        RepositoryCreated (Ok repo) ->
             model
-                => Cmd.none
+            => Cmd.batch [Route.modifyUrl (Route.ShowRepository repo.namespace repo.name)]
 
 
 errorsDecoder : Decoder (List String)

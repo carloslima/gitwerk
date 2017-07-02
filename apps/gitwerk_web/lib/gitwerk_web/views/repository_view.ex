@@ -10,7 +10,8 @@ defmodule Gitwerk.Web.RepositoryView do
     %{
       id: repository.id,
       name: repository.name,
-      user: %{username: repository.user.username}
+      namespace: repository.user.username,
+      privacy: repository.privacy,
     }
   end
 end
