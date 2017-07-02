@@ -6,7 +6,7 @@ defmodule GitwerkData.Authorization do
     false
   end
 
-  def can?(%User{id: user_id}, :show, %Repository{user_id: user_id, privacy: :private}) do
+  def can?(%User{id: _user_id}, :show, %Repository{user_id: user_id, privacy: :private}) do
     true
   end
 

@@ -2,6 +2,7 @@ defmodule GitwerkData.Projects.Repository do
   use Ecto.Schema
   import Ecto.Changeset
   alias GitwerkData.Projects.Repository
+  alias GitwerkData.Accounts.User
   alias GitwerkData.EnumRepositoryPrivacies
 
 
@@ -10,7 +11,8 @@ defmodule GitwerkData.Projects.Repository do
   schema "projects_repositories" do
     field :name, :string
     field :privacy, EnumRepositoryPrivacies
-    field :user_id, Ecto.UUID
+
+    belongs_to :user, User
 
     field :repo, :any, virtual: true
     timestamps()

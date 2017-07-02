@@ -29,8 +29,8 @@ defmodule Gitwerk.Web.Router do
   scope "/api/v1", Gitwerk.Web do
     pipe_through [:api, :api_optional_auth]
     resources "/sessions", SessionController, except: [:new, :delete]
-    resources "/users", UserController, only: [:create, :show] do
-      resources "/repository", RepositoryController, param: "repository_name", only: [:show]
+    resources "/users", UserController, param: "slug", only: [:create, :show] do
+      resources "/repository", RepositoryController, param: "slug", only: [:show]
     end
   end
   scope "/api/v1", Gitwerk.Web do

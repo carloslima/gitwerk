@@ -18,7 +18,7 @@ defmodule Gitwerk.Web.UserController do
     end
   end
 
-  def show(conn, %{"id" => id}) do
+  def show(conn, %{"slug" => id}) do
     user = Accounts.get_user!(id)
     render(conn, "show.json", user: user)
   end

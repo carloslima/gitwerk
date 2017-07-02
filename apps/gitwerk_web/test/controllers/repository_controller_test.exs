@@ -35,7 +35,7 @@ defmodule Gitwerk.Web.RepositoryControllerTest do
     repository = repository_fixture(user_id: user.id)
     conn = conn_with_auth(conn, user)
     conn = get conn, user_repository_path(conn, :show, user.username, repository.name)
-    assert %{"id" => _} = json_response(conn, 200)
+    assert %{"id" => _, "user" => %{}} = json_response(conn, 200)
   end
 
   test "gets a repository that is private without auth", %{conn: conn} do

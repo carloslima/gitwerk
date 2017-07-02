@@ -7,6 +7,10 @@ defmodule Gitwerk.Web.RepositoryView do
   end
 
   def render("repository.json", %{repository: repository}) do
-    %{id: repository.id}
+    %{
+      id: repository.id,
+      name: repository.name,
+      user: %{username: repository.user.username}
+    }
   end
 end
