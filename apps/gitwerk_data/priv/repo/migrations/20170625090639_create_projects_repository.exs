@@ -13,6 +13,7 @@ defmodule GitwerkData.Repo.Migrations.CreateGitwerkData.Projects.Repository do
     end
 
     create index(:projects_repositories, [:user_id])
+    create unique_index(:projects_repositories, [:user_id, :name])
   end
 end
 

@@ -37,6 +37,13 @@ defmodule GitwerkData.ProjectsTest do
       assert repository.user_id == user.id
     end
 
+    test "create_repository/1 with same name is not allowed" do
+      user = user_fixture()
+      assert {:ok, %Repository{} = repository} = Projects.create_repository(%{@valid_attrs | user_id: user.id})
+      assert {:error, changeset} = Projects.create_repository(%{@valid_attrs | user_id: user.id})
+      assert errors_on(changeset) == %{name: ["has already been taken"]}
+    end
+
     test "create_repository/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Projects.create_repository(@invalid_attrs)
     end

@@ -25,6 +25,7 @@ defmodule GitwerkData.Projects.Repository do
     |> validate_required([:name, :user_id, :privacy])
     |> validate_format(:name, ~r/^[a-z0-9_-]*$/)
     |> foreign_key_constraint(:user_id)
+    |> unique_constraint(:name, name: :projects_repositories_user_id_name_index)
   end
 
   def force_cast(repo, attrs, allowed) do
