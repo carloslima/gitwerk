@@ -30,12 +30,12 @@ defmodule Gitwerk.Web.Router do
     pipe_through [:api, :api_optional_auth]
     resources "/sessions", SessionController, except: [:new, :delete]
     resources "/users", UserController, param: "slug", only: [:create, :show] do
-      resources "/repository", RepositoryController, param: "slug", only: [:show]
+      resources "/repositories", RepositoryController, param: "slug", only: [:show]
     end
   end
   scope "/api/v1", Gitwerk.Web do
     pipe_through [:api, :api_authenticated]
-    resources "/repository", RepositoryController, except: [:new]
+    resources "/repositories", RepositoryController, except: [:new]
   end
 
   scope "/", Gitwerk.Web do

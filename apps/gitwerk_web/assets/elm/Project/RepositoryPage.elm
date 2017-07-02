@@ -6,10 +6,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onSubmit, onClick)
 import Debug
+import Task exposing (Task)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline as Pipeline exposing (decode, optional)
 import Helpers.Views.Form as Form
-import User.SessionData exposing (Session)
+import User.SessionData as Session exposing (Session)
 import User.UserData exposing (User)
 import Project.RepositoryData exposing (Repository)
 import Project.RepositoryRequest as RepositoryRequest
@@ -20,7 +21,7 @@ import Util exposing ((=>))
 type alias Model =
     { errors : List ( String, String )
     , name : String
-    , namespace: String
+    , namespace : String
     , privacy : String
     }
 
@@ -89,20 +90,20 @@ viewForm user =
         , Form.fieldset [ class "form-control-lg" ]
             [ label []
                 [ Form.radio
-                    [ onClick (SetPrivacy Public)
+                    [ onClick (SetPrivacy Private)
                     , name "privacyPicker"
                     , checked True
                     ]
                     []
-                , text "Public"
+                , text "Private"
                 ]
             , label []
                 [ Form.radio
-                    [ onClick (SetPrivacy Private)
+                    [ onClick (SetPrivacy Public)
                     , name "privacyPicker"
                     ]
                     []
-                , text "Private"
+                , text "Public"
                 ]
             ]
         , button [ class "btn btn-lg btn-primary pull-xs-right" ]
@@ -137,10 +138,18 @@ update session msg model =
 
         SubmitForm ->
             let
-                newModule = {model | namespace = getSessionUsername(session)}
+                newModule =
+                    { model | namespace = getSessionUsername (session) }
+
+                authToken =
+                    Session.maybeAuthToken session
+
+                cmdToCreateRepo =
+                    RepositoryRequest.new newModule authToken
+                        |> Http.send RepositoryCreated
             in
-            { newModule | errors = [] }
-                => Http.send RepositoryCreated (RepositoryRequest.new newModule)
+                { newModule | errors = [] }
+                    => cmdToCreateRepo
 
         RepositoryCreated (Err error) ->
             let
