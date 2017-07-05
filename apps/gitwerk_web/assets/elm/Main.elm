@@ -9,21 +9,25 @@ import User.LoginPage
 import User.SignupPage
 import Home.MainPage
 import Project.RepositoryPage
+import Project.RepositoryData exposing (Repository)
 import User.SessionData exposing (Session)
 import User.UserData as User exposing (User)
 import Helpers.Ports as Ports
 import Util exposing ((=>))
 import Debug
 import View
+import Helpers.Page.Errored as Errored exposing (PageLoadError)
 
 
 type Page
     = Blank
     | NotFound
+    | Errored PageLoadError
     | Login User.LoginPage.Model
     | Join User.SignupPage.Model
     | Home Home.MainPage.Model
     | Project Project.RepositoryPage.Model
+    | ShowRepository Repository
 
 
 type PageState
@@ -37,16 +41,13 @@ type alias Model =
     }
 
 
-type PageLoadError
-    = PageLoadError Model
-
-
 type Msg
     = SetRoute (Maybe Route)
     | LoginMsg User.LoginPage.Msg
     | JoinMsg User.SignupPage.Msg
     | HomeMsg Home.MainPage.Msg
     | ProjectMsg Project.RepositoryPage.Msg
+    | RepositoryLoaded String String (Result PageLoadError Repository)
     | SetUser (Maybe User)
 
 
@@ -76,7 +77,12 @@ viewPage session isLoading page =
                 Html.text "Not Found"
 
             Blank ->
-                Html.text "Blank"
+                Html.text ""
+                    |> frame View.Other
+
+            Errored subModel ->
+                Errored.view session subModel
+                    |> frame View.Other
 
             Login subModel ->
                 User.LoginPage.view session subModel
@@ -95,6 +101,11 @@ viewPage session isLoading page =
 
             Project subModel ->
                 Project.RepositoryPage.view session subModel
+                    |> frame View.Home
+                    |> Html.map ProjectMsg
+
+            ShowRepository subModel ->
+                Project.RepositoryPage.viewShow session subModel
                     |> frame View.Home
                     |> Html.map ProjectMsg
 
@@ -130,6 +141,13 @@ updatePage page msg model =
         case ( msg, page ) of
             ( SetRoute route, _ ) ->
                 setRoute route model
+
+            ( RepositoryLoaded namespace repo_name (Ok subModel), _ ) ->
+                { model | pageState = Loaded (ShowRepository subModel) }
+                    => Cmd.none
+
+            ( RepositoryLoaded _ _ (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
 
             ( LoginMsg subMsg, Login subModel ) ->
                 let
@@ -170,10 +188,27 @@ updatePage page msg model =
                 in
                     ( { newModel | pageState = Loaded (Join pageModel) }, Cmd.map JoinMsg cmd )
 
-            ( ProjectMsg subMsg, Project subModel) ->
+            ( ProjectMsg subMsg, Project subModel ) ->
                 toPage Project ProjectMsg (Project.RepositoryPage.update model.session) subMsg subModel
-            ( _, _ ) ->
-                Debug.log "unhandled event" ( model, Cmd.none )
+
+            ( subMsg, subModel ) ->
+                let
+                    _ =
+                        Debug.log "subMsg: " subMsg
+
+                    _ =
+                        Debug.log "subModel: " subModel
+                in
+                    Debug.log "unhandled event" ( model, Cmd.none )
+
+
+pageErrored : Model -> View.ActivePage -> String -> ( Model, Cmd msg )
+pageErrored model activePage errorMessage =
+    let
+        error =
+            Errored.pageLoadError activePage errorMessage
+    in
+        { model | pageState = Loaded (Errored error) } => Cmd.none
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -181,6 +216,9 @@ setRoute maybeRoute model =
     let
         transition toMsg task =
             ( { model | pageState = TransitioningFrom (getPage model.pageState) }, Task.attempt toMsg task )
+
+        errored =
+            pageErrored model
     in
         case maybeRoute of
             Nothing ->
@@ -208,6 +246,9 @@ setRoute maybeRoute model =
 
             Just (Route.NewRepository) ->
                 ( { model | pageState = Loaded (Project Project.RepositoryPage.initNew) }, Cmd.none )
+
+            Just (Route.ShowRepository namespace repo) ->
+                transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo model.session)
 
 
 subscriptions : Model -> Sub Msg

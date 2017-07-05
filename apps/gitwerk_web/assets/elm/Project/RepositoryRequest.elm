@@ -1,9 +1,9 @@
-module Project.RepositoryRequest exposing (new)
+module Project.RepositoryRequest exposing (new, get)
 
 import Http
 import Json.Encode as Encode
 import Json.Decode as Decode
-import HttpBuilder exposing (RequestBuilder, withBody, withExpect, withQueryParams)
+import HttpBuilder exposing (RequestBuilder, withBody, withExpect, withQueryParams, withHeader)
 
 import Util exposing ((=>))
 import Util exposing ((=>))
@@ -38,4 +38,19 @@ new { namespace, name, privacy } maybeToken =
        |> withBody body
        |> HttpBuilder.withExpect expect
        |> withAuthorization maybeToken
+       |> withHeader "Accept" "application/json"
+       |> HttpBuilder.toRequest
+
+get : String -> String -> Maybe JWTAuthToken -> Http.Request Repository
+get namespace name maybeToken =
+    let
+        expect =
+            Repository.decoder
+            |> Http.expectJson
+    in
+       apiUrl ("users/" ++ namespace ++ "/repositories/" ++ name)
+       |> HttpBuilder.get
+       |> HttpBuilder.withExpect expect
+       |> withAuthorization maybeToken
+       |> withHeader "Accept" "application/json"
        |> HttpBuilder.toRequest

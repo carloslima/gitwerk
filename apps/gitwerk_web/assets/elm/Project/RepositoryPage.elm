@@ -17,6 +17,8 @@ import Project.RepositoryRequest as RepositoryRequest
 import Helpers.Request.ErrorsData as ErrorsData
 import Util exposing ((=>))
 import Route
+import Helpers.Page.Errored as Errored exposing (PageLoadError, pageLoadError)
+import View
 
 
 type alias Model =
@@ -51,6 +53,27 @@ initNew =
     , privacy = "private"
     }
 
+
+initShow : String -> String -> Session -> Task PageLoadError Repository
+initShow namespace repo session =
+    let
+        authToken =
+            Session.maybeAuthToken session
+
+        handleLoadError _ =
+            pageLoadError View.Other "Repository is currently unavailable."
+    in
+       RepositoryRequest.get namespace repo authToken
+       |> Http.toTask
+       |> Task.mapError handleLoadError
+       --|> Task.map(\_ -> { errors = [] , name = "" , namespace = "" , privacy = "private" }
+
+
+
+viewShow : Session -> Repository -> Html Msg
+viewShow session model =
+    div [ class "repo-first-page" ]
+    [ h1 [ class "text-xs-center" ] [ text ("Show Repo " ++ model.name) ] ]
 
 view : Session -> Model -> Html Msg
 view session model =
@@ -162,7 +185,7 @@ update session msg model =
 
         RepositoryCreated (Ok repo) ->
             model
-            => Cmd.batch [Route.modifyUrl (Route.ShowRepository repo.namespace repo.name)]
+                => Cmd.batch [ Route.modifyUrl (Route.ShowRepository repo.namespace repo.name) ]
 
 
 errorsDecoder : Decoder (List String)
