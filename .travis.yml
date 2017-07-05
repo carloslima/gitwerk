@@ -11,6 +11,9 @@ cache:
 
 addons:
   - postgresql: "9.5"
+  - apt:
+    packages:
+      - libssh2-1-dev
 
 os:
   - linux
