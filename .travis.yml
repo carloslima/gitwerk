@@ -21,7 +21,9 @@ os:
   - linux
 
 env:
-  LIBGIT2=~/libgit2/_install/ LD_LIBRARY_PATH=~/libgit2/_install/lib
+  global:
+    - LIBGIT2=~/libgit2/_install/
+    - LD_LIBRARY_PATH=~/libgit2/_install/lib
   matrix:
     - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=node
 
