@@ -4,10 +4,11 @@
 /deps
 *.ez
 erl_crash.dump
-/node_modules
 /priv/static/
 /config/prod.secret.exs
 *.sw?
 *.beam
 doc
 gh-pages
+node_modules
+elm-stuff

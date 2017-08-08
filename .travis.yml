@@ -56,5 +56,5 @@ before_script:
   - cp apps/gitwerk_data/config/travis.exs apps/gitwerk_data/config/test.exs
 script:
   - mix test
-  - cd apps/gitwerk_web/assets/
+  - cd assets/
   - elm test
