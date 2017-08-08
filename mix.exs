@@ -44,7 +44,7 @@ defmodule GitWerk.Mixfile do
       {:guardian, "~> 0.14"},
       {:comeonin, "~> 3.0"},
       {:ecto_enum, "~> 1.0"},
-      {:geef, github: "carlosmn/geef"},
+      {:gixir, github: "slashmili/gixir"},
     ]
   end
 
