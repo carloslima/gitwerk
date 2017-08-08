@@ -1,11 +1,11 @@
 use Mix.Config
 
 # Configure your database
-config :gitwerk_data, GitwerkData.Repo,
+config :git_werk, GitWerk.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "",
-  database: "gitwerk_test",
+  database: "git_werk_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
