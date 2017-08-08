@@ -59,7 +59,7 @@ install:
   - mix deps.get
 
 before_script:
-  - cp apps/gitwerk_data/config/travis.exs apps/gitwerk_data/config/test.exs
+  - cp config/travis.exs config/test.exs
 script:
   - mix test
   - cd assets/
