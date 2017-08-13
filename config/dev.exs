@@ -57,5 +57,5 @@ config :git_werk, GitWerk.Repo,
   hostname: "localhost",
   pool_size: 10
 
-config :git_werk, GitwerkData.Projects.Git,
+config :git_werk, GitWerk.Projects.Git,
   git_home_dir:  Path.join([Path.expand("."), "priv", "dev"])

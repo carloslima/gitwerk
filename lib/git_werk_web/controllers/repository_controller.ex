@@ -21,10 +21,10 @@ defmodule GitWerkWeb.RepositoryController do
   end
 
   def show(conn, %{"user_slug" => username, "slug" => repository_name}) do
-    auth_user = Guardian.Plug.current_resource(conn)
-    with user when not is_nil(user) <- Accounts.get_user_by!(%{username: username}),
-         repo when not is_nil(repo) <- Projects.get_repository_by!(%{user_id: user.id, name: repository_name}),
-         true <- GitWerk.Authorization.can?(auth_user, :show, repo) do
+    auth_user = Accounts.get_current_user(conn)
+    with user when not is_nil(user) <- Accounts.get_user_by(%{username: username}),
+         repo when not is_nil(repo) <- Projects.get_repository_by(%{user_id: user.id, name: repository_name}),
+         :ok <- GitWerk.Authorization.can?(auth_user, :show, repo) do
            conn
            |> render("repository.json", repository: %{repo | user: user})
     else

@@ -1,4 +1,5 @@
 defmodule GitWerkWeb.AuthErrorHandler do
+  @moduledoc false
   import Phoenix.Controller
   import Plug.Conn
 

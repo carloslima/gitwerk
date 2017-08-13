@@ -1,4 +1,5 @@
 defmodule GitWerk.Accounts.User do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
   alias GitWerk.Accounts.User
@@ -59,13 +60,13 @@ defmodule GitWerk.Accounts.User do
   def validate_password(%__MODULE__{} = user, password) do
     case Comeonin.Bcrypt.checkpw(password, user.password_hash) do
       true -> {:ok, user}
-      false -> invalid_user_changeset
+      false -> invalid_user_changeset()
     end
   end
 
   def validate_password(_, _password) do
     Comeonin.Bcrypt.dummy_checkpw
-    invalid_user_changeset
+    invalid_user_changeset()
   end
 
   defp invalid_user_changeset do

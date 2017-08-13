@@ -12,3 +12,5 @@ doc
 gh-pages
 node_modules
 elm-stuff
+priv/dev
+priv/test

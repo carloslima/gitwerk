@@ -1,16 +1,17 @@
 defmodule GitWerk.Authorization do
+  @moduledoc false
   alias GitWerk.Accounts.User
   alias GitWerk.Projects.Repository
 
   def can?(_, :show, %Repository{privacy: :public}) do
-    false
+    :ok
   end
 
-  def can?(%User{id: _user_id}, :show, %Repository{user_id: user_id, privacy: :private}) do
-    true
+  def can?(%User{id: user_id}, :show, %Repository{user_id: user_id, privacy: :private}) do
+    :ok
   end
 
-  def can?(nil, :show, %Repository{user_id: user_id, privacy: :private}) do
-    false
+  def can?(nil, :show, %Repository{user_id: _, privacy: :private}) do
+    {:error, :unauthorized}
   end
 end

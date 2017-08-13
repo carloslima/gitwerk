@@ -52,7 +52,7 @@ defmodule GitWerk.Projects do
   """
   def get_repository!(id), do: Repo.get!(Repository, id)
 
-  def get_repository_by!(condition), do: Repo.get_by!(Repository, condition)
+  def get_repository_by(condition), do: Repo.get_by(Repository, condition)
 
   @doc """
   Creates a repository.
@@ -119,4 +119,3 @@ defmodule GitWerk.Projects do
     Repository.changeset(repository, %{})
   end
 end
-

@@ -1,4 +1,5 @@
 defmodule GitWerk.Projects.Repository do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
   alias GitWerk.Projects.Repository

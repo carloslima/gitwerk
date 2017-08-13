@@ -37,7 +37,14 @@ defmodule GitWerk.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
-  def get_user_by!(condition), do: Repo.get_by!(User, condition)
+  def get_user_by(condition), do: Repo.get_by(User, condition)
+
+  @doc """
+  Gets current user or returns nil
+  """
+  def get_current_user(conn) do
+    Guardian.Plug.current_resource(conn)
+  end
 
   @doc """
     Gets a user if password matches

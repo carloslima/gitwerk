@@ -21,5 +21,5 @@ config :git_werk, GitWerk.Repo,
 config :comeonin, :bcrypt_log_rounds, 4
 config :comeonin, :pbkdf2_rounds, 1
 
-config :git_werk, GitwerkData.Projects.Git,
+config :git_werk, GitWerk.Projects.Git,
   git_home_dir:  Path.join([Path.expand("."), "priv", "test"])

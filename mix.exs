@@ -38,13 +38,15 @@ defmodule GitWerk.Mixfile do
       {:phoenix_ecto, "~> 3.2"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.10"},
-      {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:guardian, "~> 0.14"},
       {:comeonin, "~> 3.0"},
       {:ecto_enum, "~> 1.0"},
       {:gixir, github: "slashmili/gixir"},
+
+      {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
     ]
   end
 
