@@ -2,9 +2,10 @@ defmodule GitWerkWeb.RepositoryController do
   use GitWerkWeb, :controller
 
   alias GitWerk.Projects
-  alias GitWerk.Accounts
 
   action_fallback GitWerkWeb.FallbackController
+
+  plug GitWerkWeb.LoadRepositoryPlug when action in [:show]
 
   def index(conn, _) do
     render conn, "index.json", repositories: []
@@ -20,13 +21,10 @@ defmodule GitWerkWeb.RepositoryController do
     end
   end
 
-  def show(conn, %{"user_slug" => username, "slug" => repository_name}) do
-    auth_user = Accounts.get_current_user(conn)
-    with user when not is_nil(user) <- Accounts.get_user_by(%{username: username}),
-         repo when not is_nil(repo) <- Projects.get_repository_by(%{user_id: user.id, name: repository_name}),
-         :ok <- GitWerk.Authorization.can?(auth_user, :show, repo) do
-           conn
-           |> render("repository.json", repository: %{repo | user: user})
+  def show(conn, %{"user_slug" => _, "slug" => _}) do
+    with repo when not is_nil(repo) <- conn.assigns.repository do
+      conn
+      |> render("repository.json", repository: repo)
     else
       _ -> {:error, :not_found}
     end
