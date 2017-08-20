@@ -12,6 +12,14 @@ defmodule GitWerk.TestHelpers do
     user
   end
 
+  def project_fixture(user, attrs \\ %{}) do
+    repo_name = rand_str()
+    valid_repo = %{name: repo_name, privacy: :private}
+    attrs = Enum.into(attrs, valid_repo)
+    {:ok, repository} = Projects.create(user, attrs)
+    repository
+  end
+
   def repository_fixture(attrs \\ %{}) do
     repo_name = rand_str()
     valid_repo = %{name: repo_name, privacy: :private, user_id: nil}
@@ -33,5 +41,11 @@ defmodule GitWerk.TestHelpers do
   defp rand_str do
     Base.encode16(:crypto.strong_rand_bytes(9))
     |> String.downcase
+  end
+
+  def repo_path(username, repo_name) do
+    opts = Application.get_env(:git_werk, GitWerk.Projects.Git)
+    opts[:git_home_dir]
+    "#{opts[:git_home_dir]}/#{username}/#{repo_name}.git"
   end
 end

@@ -24,6 +24,15 @@ defmodule GitWerk.Projects do
   end
 
   @doc """
+  Returns the list of files for given repository for given reference and path
+  """
+  def list_repository_files(repository, reference, path) do
+    user = repository.user
+    {:ok, pid} = Git.open(user.username, repository.name)
+    Git.ls_files(pid, reference, path)
+  end
+
+  @doc """
   Returns the list of repositories.
 
   ## Examples
