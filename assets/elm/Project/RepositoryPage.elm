@@ -106,12 +106,24 @@ viewShow session model =
 
 viewListFiles : Model -> List (Html MsgShow)
 viewListFiles model =
-    case model.fileList of
-        Just fileList ->
-            (List.map (\file -> div [] [ text file.name ]) fileList)
+    let
+        fileListError =
+            model.errors
+                |> List.filter (\( title, _ ) -> title == "FileList")
+                |> List.map (\( _, msg ) -> msg)
+                |> List.head
+    in
+        case fileListError of
+            Nothing ->
+                case model.fileList of
+                    Just fileList ->
+                        (List.map (\file -> div [] [ text file.name ]) fileList)
 
-        Nothing ->
-            [ div [] [ text "loading..." ] ]
+                    Nothing ->
+                        [ div [] [ text "loading..." ] ]
+
+            Just errorMessage ->
+                [ div [] [ text (errorMessage ++ " :(") ] ]
 
 
 updateShow : Session -> MsgShow -> Model -> ( Model, Cmd MsgShow )
@@ -121,9 +133,13 @@ updateShow session msg model =
             { model | fileList = Just fileList }
                 => Cmd.none
 
-        _ ->
-            model
-                => Cmd.none
+        RepositoryLoadedFiles (Err error) ->
+            let
+                _ =
+                    Debug.log "error " error
+            in
+                { model | errors = [ "FileList" => "failed to fetch file list" ] }
+                    => Cmd.none
 
 
 view : Session -> Model -> Html Msg
