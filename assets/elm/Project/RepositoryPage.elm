@@ -13,6 +13,7 @@ import Helpers.Views.Form as Form
 import User.SessionData as Session exposing (Session)
 import User.UserData exposing (User)
 import Project.RepositoryData exposing (Repository)
+import Project.FileData exposing (File)
 import Project.RepositoryRequest as RepositoryRequest
 import Helpers.Request.ErrorsData as ErrorsData
 import Util exposing ((=>))
@@ -26,7 +27,12 @@ type alias Model =
     , name : String
     , namespace : String
     , privacy : String
+    , fileList : Maybe (List File)
     }
+
+
+type MsgShow
+    = RepositoryLoadedFiles (Result Http.Error (List File))
 
 
 type Msg
@@ -51,10 +57,11 @@ initNew =
     , name = ""
     , namespace = ""
     , privacy = "private"
+    , fileList = Nothing
     }
 
 
-initShow : String -> String -> Session -> Task PageLoadError Repository
+initShow : String -> String -> Session -> Task PageLoadError Model
 initShow namespace repo session =
     let
         authToken =
@@ -63,17 +70,61 @@ initShow namespace repo session =
         handleLoadError _ =
             pageLoadError View.Other "Repository is currently unavailable."
     in
-       RepositoryRequest.get namespace repo authToken
-       |> Http.toTask
-       |> Task.mapError handleLoadError
-       --|> Task.map(\_ -> { errors = [] , name = "" , namespace = "" , privacy = "private" }
+        RepositoryRequest.get namespace repo authToken
+            |> Http.toTask
+            |> Task.mapError handleLoadError
+            |> Task.map
+                (\repo ->
+                    { errors = []
+                    , name = repo.name
+                    , namespace = repo.namespace
+                    , privacy = repo.privacy
+                    , fileList = Nothing
+                    }
+                )
 
 
+listFiles : Model -> Session -> Cmd MsgShow
+listFiles repo session =
+    let
+        authToken =
+            Session.maybeAuthToken session
+    in
+        RepositoryRequest.listFiles repo authToken
+            |> Http.send RepositoryLoadedFiles
 
-viewShow : Session -> Repository -> Html Msg
+
+viewShow : Session -> Model -> Html MsgShow
 viewShow session model =
     div [ class "repo-first-page" ]
-    [ h1 [ class "text-xs-center" ] [ text ("Show Repo " ++ model.name) ] ]
+        [ h1 [ class "text-xs-center" ]
+            [ text ("Show Repo " ++ model.name)
+            ]
+        , div [] (viewListFiles model)
+        ]
+
+
+viewListFiles : Model -> List (Html MsgShow)
+viewListFiles model =
+    case model.fileList of
+        Just fileList ->
+            (List.map (\file -> div [] [ text file.name ]) fileList)
+
+        Nothing ->
+            [ div [] [ text "loading..." ] ]
+
+
+updateShow : Session -> MsgShow -> Model -> ( Model, Cmd MsgShow )
+updateShow session msg model =
+    case msg of
+        RepositoryLoadedFiles (Ok fileList) ->
+            { model | fileList = Just fileList }
+                => Cmd.none
+
+        _ ->
+            model
+                => Cmd.none
+
 
 view : Session -> Model -> Html Msg
 view session model =

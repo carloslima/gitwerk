@@ -14,3 +14,4 @@ node_modules
 elm-stuff
 priv/dev
 priv/test
+assets/js/main.js

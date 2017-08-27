@@ -27,7 +27,7 @@ type Page
     | Join User.SignupPage.Model
     | Home Home.MainPage.Model
     | Project Project.RepositoryPage.Model
-    | ShowRepository Repository
+    | ShowRepository Project.RepositoryPage.Model
 
 
 type PageState
@@ -47,7 +47,8 @@ type Msg
     | JoinMsg User.SignupPage.Msg
     | HomeMsg Home.MainPage.Msg
     | ProjectMsg Project.RepositoryPage.Msg
-    | RepositoryLoaded String String (Result PageLoadError Repository)
+    | ProjectCodeMsg Project.RepositoryPage.MsgShow
+    | RepositoryLoaded String String (Result PageLoadError Project.RepositoryPage.Model)
     | SetUser (Maybe User)
 
 
@@ -107,7 +108,7 @@ viewPage session isLoading page =
             ShowRepository subModel ->
                 Project.RepositoryPage.viewShow session subModel
                     |> frame View.Home
-                    |> Html.map ProjectMsg
+                    |> Html.map ProjectCodeMsg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -144,7 +145,7 @@ updatePage page msg model =
 
             ( RepositoryLoaded namespace repo_name (Ok subModel), _ ) ->
                 { model | pageState = Loaded (ShowRepository subModel) }
-                    => Cmd.none
+                    => Cmd.map ProjectCodeMsg (Project.RepositoryPage.listFiles subModel session)
 
             ( RepositoryLoaded _ _ (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
@@ -191,6 +192,9 @@ updatePage page msg model =
             ( ProjectMsg subMsg, Project subModel ) ->
                 toPage Project ProjectMsg (Project.RepositoryPage.update model.session) subMsg subModel
 
+            ( ProjectCodeMsg subMsg, ShowRepository subModel ) ->
+                toPage ShowRepository ProjectCodeMsg (Project.RepositoryPage.updateShow model.session) subMsg subModel
+
             ( subMsg, subModel ) ->
                 let
                     _ =
@@ -215,7 +219,8 @@ setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
 setRoute maybeRoute model =
     let
         transition toMsg task =
-            ( { model | pageState = TransitioningFrom (getPage model.pageState) }, Task.attempt toMsg task )
+            { model | pageState = TransitioningFrom (getPage model.pageState) }
+                => Task.attempt toMsg task
 
         errored =
             pageErrored model
@@ -245,7 +250,8 @@ setRoute maybeRoute model =
                             ]
 
             Just (Route.NewRepository) ->
-                ( { model | pageState = Loaded (Project Project.RepositoryPage.initNew) }, Cmd.none )
+                { model | pageState = Loaded (Project Project.RepositoryPage.initNew) }
+                    => Cmd.none
 
             Just (Route.ShowRepository namespace repo) ->
                 transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo model.session)
