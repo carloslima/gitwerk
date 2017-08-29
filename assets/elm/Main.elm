@@ -141,11 +141,25 @@ updatePage page msg model =
     in
         case ( msg, page ) of
             ( SetRoute route, _ ) ->
-                setRoute route model
+                case ( route, model.pageState ) of
+                    {-
+                       This is a hack to prevent whole page reload when someone
+                       clicks on files in repo page
+                    -}
+                    ( Just (Route.ShowRepositoryTree namespace repo tree path), Loaded (ShowRepository subModel) ) ->
+                        let
+                            ( updatedModel, newCmd ) =
+                                Project.RepositoryPage.internalLoadRepo model.session subModel tree path
+                        in
+                            { model | pageState = Loaded (ShowRepository updatedModel) }
+                                => Cmd.map ProjectCodeMsg newCmd
+
+                    _ ->
+                        setRoute route model
 
             ( RepositoryLoaded namespace repo_name (Ok subModel), _ ) ->
                 { model | pageState = Loaded (ShowRepository subModel) }
-                    => Cmd.map ProjectCodeMsg (Project.RepositoryPage.listFiles subModel session)
+                    => Cmd.map ProjectCodeMsg (Project.RepositoryPage.inPageReload subModel session)
 
             ( RepositoryLoaded _ _ (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
@@ -254,7 +268,10 @@ setRoute maybeRoute model =
                     => Cmd.none
 
             Just (Route.ShowRepository namespace repo) ->
-                transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo model.session)
+                transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo "master" [] model.session)
+
+            Just (Route.ShowRepositoryTree namespace repo tree rest) ->
+                transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo tree rest model.session)
 
 
 subscriptions : Model -> Sub Msg

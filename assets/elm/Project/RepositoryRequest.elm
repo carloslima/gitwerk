@@ -58,15 +58,16 @@ get namespace name maybeToken =
             |> HttpBuilder.toRequest
 
 
-listFiles : { r | namespace : String, name : String } -> Maybe JWTAuthToken -> Http.Request (List File)
-listFiles { namespace, name } maybeToken =
+listFiles : { r | namespace : String, name : String, tree: String} -> List String -> Maybe JWTAuthToken -> Http.Request (List File)
+listFiles { namespace, name, tree} path maybeToken =
     let
         expect =
             File.decoder
                 |> Decode.list
                 |> Http.expectJson
+        file_path = String.join "/"  path
     in
-        apiUrl ("users/" ++ namespace ++ "/repositories/" ++ name ++ "/code/file-list/master")
+        apiUrl ("users/" ++ namespace ++ "/repositories/" ++ name ++ "/code/file-list/" ++ tree ++ "/" ++ file_path)
             |> HttpBuilder.get
             |> HttpBuilder.withExpect expect
             |> withAuthorization maybeToken

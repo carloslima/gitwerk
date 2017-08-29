@@ -28,11 +28,14 @@ type alias Model =
     , namespace : String
     , privacy : String
     , fileList : Maybe (List File)
+    , cwd : List String
+    , tree : String
     }
 
 
 type MsgShow
     = RepositoryLoadedFiles (Result Http.Error (List File))
+    | LoadRepositoryTree String (List String)
 
 
 type Msg
@@ -58,11 +61,13 @@ initNew =
     , namespace = ""
     , privacy = "private"
     , fileList = Nothing
+    , cwd = []
+    , tree = ""
     }
 
 
-initShow : String -> String -> Session -> Task PageLoadError Model
-initShow namespace repo session =
+initShow : String -> String -> String -> List String -> Session -> Task PageLoadError Model
+initShow namespace repo tree cwd session =
     let
         authToken =
             Session.maybeAuthToken session
@@ -80,19 +85,24 @@ initShow namespace repo session =
                     , namespace = repo.namespace
                     , privacy = repo.privacy
                     , fileList = Nothing
+                    , cwd = cwd
+                    , tree = tree
                     }
                 )
 
 
-listFiles : Model -> Session -> Cmd MsgShow
-listFiles repo session =
+listFiles : Model -> Session -> List (String)-> Cmd MsgShow
+listFiles model session filePath =
     let
         authToken =
             Session.maybeAuthToken session
     in
-        RepositoryRequest.listFiles repo authToken
+        RepositoryRequest.listFiles model filePath authToken
             |> Http.send RepositoryLoadedFiles
 
+inPageReload: Model -> Session -> Cmd MsgShow
+inPageReload model session =
+    listFiles model session model.cwd
 
 viewShow : Session -> Model -> Html MsgShow
 viewShow session model =
@@ -117,7 +127,7 @@ viewListFiles model =
             Nothing ->
                 case model.fileList of
                     Just fileList ->
-                        (List.map (\file -> div [] [ text file.name ]) fileList)
+                        (List.map (\file -> div [] [ viewListFilesLinks model file ]) fileList)
 
                     Nothing ->
                         [ div [] [ text "loading..." ] ]
@@ -125,6 +135,25 @@ viewListFiles model =
             Just errorMessage ->
                 [ div [] [ text (errorMessage ++ " :(") ] ]
 
+
+viewListFilesLinks : Model -> File -> Html MsgShow
+viewListFilesLinks model file =
+    div [] [ a [ Route.href (Route.ShowRepositoryTree model.namespace model.name model.tree (getCwd model file)) ] [ text file.name ] ]
+
+getCwd : Model -> File -> List String
+getCwd model file =
+    case model.cwd of
+        [] ->
+            [file.name]
+        cwd ->
+            List.append cwd [file.name]
+
+internalLoadRepo : Session -> Model -> String -> List String -> ( Model, Cmd MsgShow )
+internalLoadRepo session model tree path =
+    let
+        msg = LoadRepositoryTree tree path
+    in
+    updateShow session msg model
 
 updateShow : Session -> MsgShow -> Model -> ( Model, Cmd MsgShow )
 updateShow session msg model =
@@ -140,6 +169,10 @@ updateShow session msg model =
             in
                 { model | errors = [ "FileList" => "failed to fetch file list" ] }
                     => Cmd.none
+
+        LoadRepositoryTree tree path ->
+            model
+                => listFiles model session path
 
 
 view : Session -> Model -> Html Msg
@@ -209,7 +242,7 @@ allowedRepoSubNameOptions user =
 
 update : Session -> Msg -> Model -> ( Model, Cmd Msg )
 update session msg model =
-    case Debug.log "msg: " msg of
+    case msg of
         SetRepositoryName repo_name ->
             { model | name = repo_name }
                 => Cmd.none

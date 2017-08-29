@@ -1,11 +1,10 @@
 module Route exposing (Route(..), href, modifyUrl, fromLocation)
 
-import UrlParser as Url exposing (parseHash, s, (</>), string, oneOf, Parser)
+import UrlParser2 as Url exposing (parseHash, s, (</>), string, wildcard, (</*>), oneOf, Parser)
 import Navigation exposing (Location)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Debug
-import UrlParser as Url exposing ((</>))
 
 
 type Route
@@ -15,6 +14,7 @@ type Route
     | Logout
     | NewRepository
     | ShowRepository String String
+    | ShowRepositoryTree String String String (List String)
 
 
 route : Parser (Route -> a) a
@@ -26,6 +26,7 @@ route =
         , Url.map Logout (s "logout")
         , Url.map NewRepository (s "repo")
         , Url.map ShowRepository (string </> string)
+        , Url.map ShowRepositoryTree (string </> string </> s "tree" </> string </> wildcard)
         ]
 
 
@@ -51,6 +52,9 @@ routeToString page =
 
                 ShowRepository namespace repo ->
                     [ namespace, repo ]
+
+                ShowRepositoryTree namespace repo tree rest ->
+                    List.append [ namespace, repo, "tree", tree ] rest
     in
         "#/" ++ (String.join "/" pieces)
 
