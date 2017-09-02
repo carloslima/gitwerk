@@ -8,6 +8,12 @@ defmodule GitWerkWeb.UserKeyControllerTest do
   describe "while user is logged in ->" do
     setup [:user_fixture_context, :conn_accept_json_context, :conn_with_auth_context]
 
+    test "lists ssh keys", %{conn: conn, user: user} do
+      fixture(:user_key, %{user: user})
+      conn = get conn, user_setting_key_path(conn, :index, user.username)
+      assert json_response(conn, 200)
+    end
+
     test "adds ssh key", %{conn: conn, user: user} do
       conn = post conn, user_setting_key_path(conn, :create, user.username), key: @create_attrs
       assert json_response(conn, :created)
@@ -24,15 +30,28 @@ defmodule GitWerkWeb.UserKeyControllerTest do
       conn = post conn, user_setting_key_path(conn, :create, other_user.username), key: @create_attrs
       assert json_response(conn, :forbidden)
     end
+
+    test "is not allowed to view others key", %{conn: conn} do
+      other_user = fixture(:user)
+      conn = get conn, user_setting_key_path(conn, :index, other_user.username)
+      assert json_response(conn, :forbidden)
+    end
+
   end
 
 
   describe "when anonymous sends request ->" do
     setup [:user_fixture_context, :conn_accept_json_context]
 
-    test "doesn't allow the user tp create key for others", %{conn: conn, user: user} do
+    test "doesn't allow anonymous to create key for others", %{conn: conn, user: user} do
       conn = post conn, user_setting_key_path(conn, :create, user.username), key: @invalid_attrs
       assert json_response(conn, :unauthorized)
     end
+
+    test "doesn't allow anonymous to view others keys", %{conn: conn, user: user} do
+      conn = get conn, user_setting_key_path(conn, :index, user.username)
+      assert json_response(conn, :unauthorized)
+    end
+
   end
 end

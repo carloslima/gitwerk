@@ -5,13 +5,22 @@ defmodule GitWerkWeb.UserKeyController do
 
   action_fallback GitWerkWeb.FallbackController
 
+  def index(conn, %{"user_slug" => req_username}) do
+    current_user = Accounts.get_current_user(conn)
+    with :ok <- validate_user(current_user.username, req_username),
+         keys <- Accounts.list_keys_for(current_user) do
+           conn
+           |> render("index.json", user_keys: keys)
+    end
+  end
+
   def create(conn, %{"user_slug" => req_username, "key" => key_params}) do
     current_user = Accounts.get_current_user(conn)
     with :ok <- validate_user(current_user.username, req_username),
          {:ok, key} <- Accounts.create_key(current_user, key_params) do
       conn
       |> put_status(:created)
-      |> render("key.json", key: key)
+      |> render("key.json", user_key: key)
     end
   end
 

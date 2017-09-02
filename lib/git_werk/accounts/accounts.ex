@@ -131,6 +131,14 @@ defmodule GitWerk.Accounts do
   end
 
   @doc """
+  Lists keys for given user
+  """
+  def list_keys_for(%User{} = user) do
+    q = from k in UserKey, where: k.user_id == ^user.id
+    Repo.all(q)
+  end
+
+  @doc """
   Update used_at field
   """
   def update_key(%UserKey{} = key) do

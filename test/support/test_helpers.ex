@@ -6,6 +6,16 @@ defmodule GitWerk.TestHelpers do
     apply(__MODULE__, String.to_atom("#{item}_fixture"), [attrs])
   end
 
+  def user_key_fixture(attrs \\ %{}) do
+    user = attrs[:user] || throw "pass :user to user_key_fixture"
+    valid_key = %{title: rand_str(), type: :ssh, key: "ssh-rsa #{rand_str()}"}
+    attrs = Enum.into(attrs, valid_key)
+    {:ok, key} =
+      user
+      |> Accounts.create_key(attrs)
+    key
+  end
+
   def user_fixture(attrs \\ %{}) do
     user = rand_str()
     valid_user = %{email: "#{user}@email.com", password: "some password_hash", username: user}
