@@ -17,5 +17,11 @@ defmodule GitWerkWeb.FallbackController do
     |> put_status(:not_found)
     |> render(GitWerkWeb.ErrorView, "error.json", error: %{title: "Resource not found"})
   end
+
+  def call(conn, {:error, :forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> render(GitWerkWeb.ErrorView, "error.json", error: %{title: "Not permitted to perform the requested operation"})
+  end
 end
 

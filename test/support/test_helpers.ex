@@ -50,6 +50,14 @@ defmodule GitWerk.TestHelpers do
     |> Plug.Conn.put_req_header("authorization", "Bearer #{jwt_token}")
   end
 
+  def conn_with_auth_context(%{conn: conn, user: user}) do
+    {:ok, conn: conn_with_auth(conn, user)}
+  end
+
+  def conn_accept_json_context(%{conn: conn}) do
+    {:ok, conn: Plug.Conn.put_req_header(conn, "accept", "application/json")}
+  end
+
   defp rand_str do
     Base.encode16(:crypto.strong_rand_bytes(9))
     |> String.downcase
