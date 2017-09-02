@@ -4,7 +4,7 @@ defmodule GitWerk.GitTest do
   alias GitWerk.Projects.Git
 
   test "list files in repo" do
-    user = user_fixture()
+    user = fixture(:user)
     repo = project_fixture(user)
     commit_files(user.username, repo.name)
     {:ok, git} = Git.open(user.username, repo.name)

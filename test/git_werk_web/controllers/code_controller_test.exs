@@ -2,37 +2,35 @@ defmodule GitWerkWeb.CodeControllerTest do
   use GitWerkWeb.ConnCase
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    conn = put_req_header(conn, "accept", "application/json")
+    {:ok, conn: conn}
   end
 
-  test "get list of files in a repository", %{conn: conn} do
-    user = user_fixture()
-    repo = project_fixture(user)
-    commit_files(user.username, repo.name)
+
+  setup [:user_fixture_context, :project_fixture_context]
+
+  test "get list of files in a repository", %{conn: conn, user: user, project: project} do
+    commit_files(user.username, project.name)
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_code_path(conn, :file_list, user.username, repo.name, "master", [])
+    conn = get conn, user_repository_code_path(conn, :file_list, user.username, project.name, "master", [])
     file_list = json_response(conn, 200)
     assert file_list
     assert length(file_list) == 2
   end
 
 
-  test "get list of files in a sub dir in a repository", %{conn: conn} do
-    user = user_fixture()
-    repo = project_fixture(user)
-    commit_files(user.username, repo.name)
+  test "get list of files in a sub dir in a repository", %{conn: conn, user: user, project: project} do
+    commit_files(user.username, project.name)
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_code_path(conn, :file_list, user.username, repo.name, "master", ["src"])
+    conn = get conn, user_repository_code_path(conn, :file_list, user.username, project.name, "master", ["src"])
     file_list = json_response(conn, 200)
     assert file_list == [%{"name" => "code.src", "type" => "blob"}]
     assert length(file_list) == 1
   end
 
-  test "returns 404 when repo is empty or face an error", %{conn: conn} do
-    user = user_fixture()
-    repo = project_fixture(user)
+  test "returns 404 when repo is empty or face an error", %{conn: conn, user: user, project: project} do
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_code_path(conn, :file_list, user.username, repo.name, "master", [])
+    conn = get conn, user_repository_code_path(conn, :file_list, user.username, project.name, "master", [])
     assert json_response(conn, 404)
   end
 

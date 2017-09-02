@@ -2,6 +2,10 @@ defmodule GitWerk.TestHelpers do
   alias GitWerk.Accounts
   alias GitWerk.Projects
 
+  def fixture(item, attrs \\ %{}) do
+    apply(__MODULE__, String.to_atom("#{item}_fixture"), [attrs])
+  end
+
   def user_fixture(attrs \\ %{}) do
     user = rand_str()
     valid_user = %{email: "#{user}@email.com", password: "some password_hash", username: user}
@@ -12,12 +16,20 @@ defmodule GitWerk.TestHelpers do
     user
   end
 
+  def user_fixture_context(_) do
+    {:ok, user: fixture(:user)}
+  end
+
   def project_fixture(user, attrs \\ %{}) do
     repo_name = rand_str()
     valid_repo = %{name: repo_name, privacy: :private}
     attrs = Enum.into(attrs, valid_repo)
     {:ok, repository} = Projects.create(user, attrs)
     repository
+  end
+
+  def project_fixture_context(%{user: user}) do
+    {:ok, project: project_fixture(user)}
   end
 
   def repository_fixture(attrs \\ %{}) do

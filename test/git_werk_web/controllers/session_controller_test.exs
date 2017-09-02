@@ -1,15 +1,6 @@
 defmodule GitWerkWeb.SessionControllerTest do
   use GitWerkWeb.ConnCase
 
-  alias GitWerk.Accounts
-
-  @create_attrs %{email: "some@email.com", password: "some password_hash", username: "some_username"}
-
-  def fixture(:user) do
-    {:ok, user} = Accounts.create_user(@create_attrs)
-    user
-  end
-
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
