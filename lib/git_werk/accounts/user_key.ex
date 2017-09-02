@@ -29,4 +29,11 @@ defmodule GitWerk.Accounts.UserKey do
     |> validate_required([:type, :key, :title])
     |> validate_format(:key, ~r/^(ssh-rsa|ssh-dss|ssh-ed25519|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521)/)
   end
+
+  @doc false
+  def key_is_used_ch(%UserKey{} = user_key) do
+    user_key
+    |> cast(%{}, [:used_at])
+    |> put_change(:used_at, Timex.now)
+  end
 end

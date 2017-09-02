@@ -97,10 +97,20 @@ defmodule GitWerk.AccountsTest do
     @valid_key "ssh-rsa xaXaxaxaaxsaasdkjasjkadskjasdkj sam@debian.local"
     @invalid_key "invalid AAAAB3NzaC1yc2EAA user@localhost"
     @valid_key_prefix ["ssh-rsa", "ssh-dss", "ssh-ed25519", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521"]
+
     test "user adds a SSH key" do
       user = user_fixture()
       {:ok, _} = Accounts.create_key(user, %{title: @key_title,  key: @valid_key, type: :ssh})
     end
+
+    test "updates used_at" do
+      user = user_fixture()
+      {:ok, key} = Accounts.create_key(user, %{title: @key_title,  key: @valid_key, type: :ssh})
+      refute key.used_at
+      {:ok, key} = Accounts.update_key(key)
+      assert key.used_at
+    end
+
 
     test "uses user struct to set user_id" do
       hostile_user = user_fixture()

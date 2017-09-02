@@ -123,10 +123,19 @@ defmodule GitWerk.Accounts do
   @doc """
   Creates a user key for given user
   """
-  def create_key(user, attrs \\ %{}) do
+  def create_key(%User{} =user, attrs \\ %{}) do
     user
     |> Ecto.build_assoc(:user_keys, %{})
     |> UserKey.changeset(attrs)
     |> Repo.insert()
+  end
+
+  @doc """
+  Update used_at field
+  """
+  def update_key(%UserKey{} = key) do
+    key
+    |> UserKey.key_is_used_ch
+    |> Repo.update
   end
 end
