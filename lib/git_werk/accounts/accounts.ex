@@ -6,7 +6,7 @@ defmodule GitWerk.Accounts do
   import Ecto.Query, warn: false
   alias GitWerk.Repo
 
-  alias GitWerk.Accounts.User
+  alias GitWerk.Accounts.{User, UserKey}
 
   @doc """
   Returns the list of users.
@@ -118,5 +118,15 @@ defmodule GitWerk.Accounts do
   """
   def change_user(%User{} = user) do
     User.changeset(user, %{})
+  end
+
+  @doc """
+  Creates a user key for given user
+  """
+  def create_key(user, attrs \\ %{}) do
+    user
+    |> Ecto.build_assoc(:user_keys, %{})
+    |> UserKey.changeset(attrs)
+    |> Repo.insert()
   end
 end

@@ -91,4 +91,36 @@ defmodule GitWerk.AccountsTest do
       assert %Ecto.Changeset{} = Accounts.change_user(user)
     end
   end
+
+  describe "user key ->" do
+    @key_title "Office Linux"
+    @valid_key "ssh-rsa xaXaxaxaaxsaasdkjasjkadskjasdkj sam@debian.local"
+    @invalid_key "invalid AAAAB3NzaC1yc2EAA user@localhost"
+    @valid_key_prefix ["ssh-rsa", "ssh-dss", "ssh-ed25519", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521"]
+    test "user adds a SSH key" do
+      user = user_fixture()
+      {:ok, _} = Accounts.create_key(user, %{title: @key_title,  key: @valid_key, type: :ssh})
+    end
+
+    test "uses user struct to set user_id" do
+      hostile_user = user_fixture()
+      innocent_user = user_fixture()
+      {:ok, key} = Accounts.create_key(hostile_user, %{user_id: innocent_user.id, title: @key_title,  key: @valid_key, type: :ssh})
+      assert hostile_user.id == key.user_id
+    end
+
+    test "only accept a valid ssh key" do
+      user = user_fixture()
+      Enum.each @valid_key_prefix, fn valid_key ->
+        key = "#{valid_key} AAAAB3NzaC1yc2EAA user@localhost"
+        {res, _} = Accounts.create_key(user, %{title: @key_title,  key: key, type: :ssh})
+        assert res == :ok, "failed to save key:  '#{key}'"
+      end
+    end
+
+    test "doesn't allow to save wrong key" do
+      user = user_fixture()
+      {:error, _} = Accounts.create_key(user, %{title: @key_title,  key: @invalid_key, type: :ssh})
+    end
+  end
 end

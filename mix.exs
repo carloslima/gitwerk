@@ -44,7 +44,10 @@ defmodule GitWerk.Mixfile do
       {:comeonin, "~> 3.0"},
       {:ecto_enum, "~> 1.0"},
       {:gixir, github: "slashmili/gixir"},
+      {:timex_ecto, "~> 3.1"},
 
+      {:ex_guard, "~> 1.3"},
+      {:ex_unit_notifier, "~> 0.1", only: :test},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false},
     ]

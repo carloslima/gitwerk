@@ -2,7 +2,7 @@ defmodule GitWerk.Accounts.User do
   @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
-  alias GitWerk.Accounts.User
+  alias GitWerk.Accounts.{User, UserKey}
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -14,6 +14,7 @@ defmodule GitWerk.Accounts.User do
     field :password, :string, virtual: true
     field :jwt_token, :string, virtual: true
 
+    has_many :user_keys, UserKey
     timestamps()
   end
 
