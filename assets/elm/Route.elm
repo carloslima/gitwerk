@@ -15,6 +15,7 @@ type Route
     | NewRepository
     | ShowRepository String String
     | ShowRepositoryTree String String String (List String)
+    | UserSettingKey
 
 
 route : Parser (Route -> a) a
@@ -25,6 +26,7 @@ route =
         , Url.map Join (s "join")
         , Url.map Logout (s "logout")
         , Url.map NewRepository (s "repo")
+        , Url.map UserSettingKey (s "settings" </> s "keys")
         , Url.map ShowRepository (string </> string)
         , Url.map ShowRepositoryTree (string </> string </> s "tree" </> string </> wildcard)
         ]
@@ -55,6 +57,9 @@ routeToString page =
 
                 ShowRepositoryTree namespace repo tree rest ->
                     List.append [ namespace, repo, "tree", tree ] rest
+
+                UserSettingKey ->
+                    [ "settings", "keys" ]
     in
         "#/" ++ (String.join "/" pieces)
 

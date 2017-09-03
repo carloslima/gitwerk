@@ -5,7 +5,6 @@ import Json.Encode as Encode
 import Json.Decode as Decode
 import HttpBuilder exposing (RequestBuilder, withBody, withExpect, withQueryParams, withHeader)
 import Util exposing ((=>))
-import Util exposing ((=>))
 import Project.RepositoryData as Repository exposing (Repository)
 import Project.FileData as File exposing (File)
 import User.UserData exposing (JWTAuthToken)

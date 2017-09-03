@@ -5,11 +5,16 @@ import Route exposing (Route)
 import Json.Decode as Decode exposing (Value)
 import Html
 import Task
-import User.LoginPage
-import User.SignupPage
 import Home.MainPage
 import Project.RepositoryPage
 import Project.RepositoryData exposing (Repository)
+
+
+-- USER
+
+import User.LoginPage
+import User.SignupPage
+import User.SettingKeyPage
 import User.SessionData exposing (Session)
 import User.UserData as User exposing (User)
 import Helpers.Ports as Ports
@@ -28,6 +33,7 @@ type Page
     | Home Home.MainPage.Model
     | Project Project.RepositoryPage.Model
     | ShowRepository Project.RepositoryPage.Model
+    | ShowUserSettingKey User.SettingKeyPage.Model
 
 
 type PageState
@@ -49,6 +55,8 @@ type Msg
     | ProjectMsg Project.RepositoryPage.Msg
     | ProjectCodeMsg Project.RepositoryPage.MsgShow
     | RepositoryLoaded String String (Result PageLoadError Project.RepositoryPage.Model)
+    | UserKeyLoaded (Result PageLoadError User.SettingKeyPage.Model)
+    | UserSettingKeyMsg User.SettingKeyPage.Msg
     | SetUser (Maybe User)
 
 
@@ -110,6 +118,11 @@ viewPage session isLoading page =
                     |> frame View.Home
                     |> Html.map ProjectCodeMsg
 
+            ShowUserSettingKey subModel ->
+                User.SettingKeyPage.viewShow session subModel
+                    |> frame View.Home
+                    |> Html.map UserSettingKeyMsg
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -156,6 +169,13 @@ updatePage page msg model =
 
                     _ ->
                         setRoute route model
+
+            ( UserKeyLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (ShowUserSettingKey subModel) }
+                    => Cmd.none
+
+            ( UserKeyLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
 
             ( RepositoryLoaded namespace repo_name (Ok subModel), _ ) ->
                 { model | pageState = Loaded (ShowRepository subModel) }
@@ -208,6 +228,14 @@ updatePage page msg model =
 
             ( ProjectCodeMsg subMsg, ShowRepository subModel ) ->
                 toPage ShowRepository ProjectCodeMsg (Project.RepositoryPage.updateShow model.session) subMsg subModel
+
+            ( UserSettingKeyMsg subMsg, ShowUserSettingKey subModel ) ->
+                let
+                    ( pageModel, cmd ) =
+                        User.SettingKeyPage.updateShow model.session subMsg subModel
+                in
+                    { model | pageState = Loaded (ShowUserSettingKey pageModel) }
+                        => Cmd.map UserSettingKeyMsg cmd
 
             ( subMsg, subModel ) ->
                 let
@@ -268,10 +296,20 @@ setRoute maybeRoute model =
                     => Cmd.none
 
             Just (Route.ShowRepository namespace repo) ->
-                transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo "master" [] model.session)
+                transition (RepositoryLoaded namespace repo)
+                    (Project.RepositoryPage.initShow namespace repo "master" [] model.session)
 
             Just (Route.ShowRepositoryTree namespace repo tree rest) ->
-                transition (RepositoryLoaded namespace repo) (Project.RepositoryPage.initShow namespace repo tree rest model.session)
+                transition (RepositoryLoaded namespace repo)
+                    (Project.RepositoryPage.initShow namespace repo tree rest model.session)
+
+            Just (Route.UserSettingKey) ->
+                case model.session.user of
+                    Just user ->
+                        transition (UserKeyLoaded) (User.SettingKeyPage.initShow model.session)
+
+                    Nothing ->
+                        errored View.Other "Please login to acccess to this page"
 
 
 subscriptions : Model -> Sub Msg
