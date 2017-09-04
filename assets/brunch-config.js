@@ -50,6 +50,7 @@ exports.config = {
       ignore: [/vendor/]
     },
     elmBrunch: {
+      executablePath: "./node_modules/.bin",
       mainModules: ["elm/Main.elm"],
       outputFolder: "js",
       makeParameters: ['--debug'],

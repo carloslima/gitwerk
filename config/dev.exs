@@ -51,10 +51,10 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :git_werk, GitWerk.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "git_werk_dev",
-  hostname: "localhost",
+  username: System.get_env("DATABASE_USERNAME") || "postgres",
+  password: System.get_env("DATABASE_PASSWORD") || "postgres",
+  database: System.get_env("DATABASE_DBNAME") || "git_werk_dev",
+  hostname: System.get_env("DATABASE_HOST") || "localhost",
   pool_size: 10
 
 config :git_werk, GitWerk.Projects.Git,
