@@ -7,7 +7,7 @@ services:
       environment:
           POSTGRES_PASSWORD: postgres
     gitwerk:
-      command: ./test/scripts/docker_dev.sh
+      command: ./scripts/docker-run-dev.sh
       build: .
       ports:
         - "4000:4000"
