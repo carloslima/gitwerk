@@ -6,7 +6,7 @@ RUN echo "resolvconf resolvconf/linkify-resolvconf boolean false" | debconf-set-
 
 RUN apt update && \
     apt upgrade -y -qq && \
-    apt install -y -qq curl openssh-server  git-core libgit2-dev build-essential sudo locales inotify-tools
+    apt install -y -qq curl openssh-server  git-core libgit2-dev build-essential sudo locales inotify-tools pkgconf
 
 RUN cd /tmp && \
     curl -O  https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \

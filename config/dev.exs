@@ -58,7 +58,7 @@ config :git_werk, GitWerk.Repo,
   pool_size: 10
 
 config :git_werk, GitWerk.Projects.Git,
-  git_home_dir:  Path.join([Path.expand("."), "priv", "dev"])
+  git_home_dir:  Path.join([Path.expand("."), "priv", "dev", "repositories"])
 
 config :git_werk, GitWerkGuts.SshAuthorizedKeys,
   authorized_keys_file: Path.join([Path.expand("."), "priv", "dev", ".ssh", "authorized_keys2"])
