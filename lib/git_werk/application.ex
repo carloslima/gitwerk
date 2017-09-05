@@ -15,6 +15,7 @@ defmodule GitWerk.Application do
       supervisor(GitWerkWeb.Endpoint, []),
       # Start your own worker by calling: GitWerk.Worker.start_link(arg1, arg2, arg3)
       # worker(GitWerk.Worker, [arg1, arg2, arg3]),
+      supervisor(GitWerkGuts.Supervisor, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

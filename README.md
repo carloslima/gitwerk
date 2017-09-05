@@ -4,7 +4,7 @@
 ```
 touch assets/js/main.js
 docker-compose run gitwerk bash
-git@0da4aa9be510:~/gitwerk$ mix ecto.create && mix.ecto.migrate
+git@0da4aa9be510:~/gitwerk$ mix ecto.create && mix ecto.migrate
 git@0da4aa9be510:~/gitwerk$ cd assets && npm install
 docker-compose up
 ```

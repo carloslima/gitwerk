@@ -23,3 +23,6 @@ config :comeonin, :pbkdf2_rounds, 1
 
 config :git_werk, GitWerk.Projects.Git,
   git_home_dir:  Path.join([Path.expand("."), "priv", "test"])
+
+config :git_werk, GitWerkGuts.SshAuthorizedKeys,
+  authorized_keys_file: Path.join([Path.expand("."), "priv", "test", ".ssh", "authorized_keys2"])

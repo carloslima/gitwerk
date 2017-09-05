@@ -13,7 +13,7 @@ defmodule GitWerk.Accounts.UserKey do
   schema "accounts_user_keys" do
 
     field :title, :string
-    field :key, :string
+    field :key, :string, default: ""
     field :type, EnumUserKeyTypes
     field :used_at, Timex.Ecto.DateTime
 
@@ -28,6 +28,8 @@ defmodule GitWerk.Accounts.UserKey do
     |> cast(attrs, [:type, :key, :title])
     |> validate_required([:type, :key, :title])
     |> validate_format(:key, ~r/^(ssh-rsa|ssh-dss|ssh-ed25519|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521)/)
+    |> remove_key_comment()
+    |> validate_ssh_pub_key(:key)
   end
 
   @doc false
@@ -35,5 +37,26 @@ defmodule GitWerk.Accounts.UserKey do
     user_key
     |> cast(%{}, [:used_at])
     |> put_change(:used_at, Timex.now)
+  end
+
+  defp remove_key_comment(changeset) do
+    key =
+      changeset.changes[:key]
+      |> String.split(" ")
+      |> Enum.take(2)
+    if changeset.valid? && length(key) >= 2 do
+      put_change(changeset, :key, Enum.join(key, " "))
+    else
+      changeset
+    end
+  end
+
+  defp validate_ssh_pub_key(changeset, field, _opts \\ []) do
+    validate_change changeset, :key, fn :key, key ->
+      case GitWerkGuts.SshKey.validate_pub_key(key) do
+        :ok -> []
+        _ -> [{field, "Invalid SSH public key"}]
+      end
+    end
   end
 end

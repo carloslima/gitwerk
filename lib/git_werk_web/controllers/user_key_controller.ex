@@ -18,6 +18,7 @@ defmodule GitWerkWeb.UserKeyController do
     current_user = Accounts.get_current_user(conn)
     with :ok <- validate_user(current_user.username, req_username),
          {:ok, key} <- Accounts.create_key(current_user, key_params) do
+         GitWerkGuts.SshAuthorizedKeys.add(key.id, key.key)
       conn
       |> put_status(:created)
       |> render("key.json", user_key: key)

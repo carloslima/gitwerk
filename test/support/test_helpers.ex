@@ -2,13 +2,18 @@ defmodule GitWerk.TestHelpers do
   alias GitWerk.Accounts
   alias GitWerk.Projects
 
+  @valid_ssh_key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIi2vk3tcYqQHOecJDULiWwFPYR0tmVRlp9iJGBFdyaq boo@mo.local"
+  def fixture(:temp_file) do
+    tmp_file()
+  end
+
   def fixture(item, attrs \\ %{}) do
     apply(__MODULE__, String.to_atom("#{item}_fixture"), [attrs])
   end
 
   def user_key_fixture(attrs \\ %{}) do
     user = attrs[:user] || throw "pass :user to user_key_fixture"
-    valid_key = %{title: rand_str(), type: :ssh, key: "ssh-rsa #{rand_str()}"}
+    valid_key = %{title: rand_str(), type: :ssh, key: @valid_ssh_key}
     attrs = Enum.into(attrs, valid_key)
     {:ok, key} =
       user
@@ -77,5 +82,9 @@ defmodule GitWerk.TestHelpers do
     opts = Application.get_env(:git_werk, GitWerk.Projects.Git)
     opts[:git_home_dir]
     "#{opts[:git_home_dir]}/#{username}/#{repo_name}.git"
+  end
+
+  def tmp_file do
+    "priv/test/tmp_file/#{Base.encode16(:crypto.strong_rand_bytes(9))}"
   end
 end

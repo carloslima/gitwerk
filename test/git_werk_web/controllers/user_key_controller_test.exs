@@ -2,7 +2,8 @@ defmodule GitWerkWeb.UserKeyControllerTest do
   use GitWerkWeb.ConnCase
 
 
-  @create_attrs %{type: :ssh, title: "my key", key: "ssh-rsa asdasdas"}
+  @valid_key  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIi2vk3tcYqQHOecJDULiWwFPYR0tmVRlp9iJGBFdyaq boo@moo.local"
+  @create_attrs %{type: :ssh, title: "my key", key: @valid_key}
   @invalid_attrs %{type: :bar, title: "", key: "wrong for now"}
 
   describe "while user is logged in ->" do

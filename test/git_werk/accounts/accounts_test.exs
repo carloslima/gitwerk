@@ -86,16 +86,21 @@ defmodule GitWerk.AccountsTest do
     end
   end
 
-  describe "user key ->" do
+  describe "user keys ->" do
     setup [:user_fixture_context]
 
+    @valid_key "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV7zn4vREzmECWKK8EHaR/uPzMO10KIBHN3fRG0z4l3RjF+ivBwfiFmBdf52gaNfc8Wfs86jRa6MY0MJxWVq9pRyha0sVnUAzVyNBSm5tSeQyYEufTOSk2OGil/flW8F6b0EGsnIMNc37TQNdUHsVNxEw+It3Qym6utrF8AXKTBdWtPia95ynYGER1XAFhZ/nH0dXgqFEaIHDtpKV4FxrvzqST7fwU4O2z7AjOeuvrIkOioFrbS9O8Wa+MekPGE/9neYpbKTNUqTaYSx/Fo4psLvcGLnWcNLk9Gj/6P8SRYThmEtM5YEaN1/yESnIeuCR+XxV0UpCZMkausIe/d2Lv sam@local.local"
+    @valid_ecdsa_key "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBLsHHDwJQbNLn5QVupl5wpxiDqcXw1QDUgvEMEL+fMCh8KfxA3mK0FL4Q2CcbjXTvkuuVbKRGWeii+dmy9qbEwM= sam@local"
     @key_title "Office Linux"
-    @valid_key "ssh-rsa xaXaxaxaaxsaasdkjasjkadskjasdkj sam@debian.local"
+    @semi_valid_key "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDV7zn4vREzmECWKK8EHaR sam@local.local"
     @invalid_key "invalid AAAAB3NzaC1yc2EAA user@localhost"
-    @valid_key_prefix ["ssh-rsa", "ssh-dss", "ssh-ed25519", "ecdsa-sha2-nistp256", "ecdsa-sha2-nistp384", "ecdsa-sha2-nistp521"]
 
-    test "user adds a SSH key", %{user: user} do
+    test "user adds a RSA SSH key", %{user: user} do
       {:ok, _} = Accounts.create_key(user, %{title: @key_title,  key: @valid_key, type: :ssh})
+    end
+
+    test "user adds an ECDSA SSH key", %{user: user} do
+      {:ok, _} = Accounts.create_key(user, %{title: @key_title,  key: @valid_ecdsa_key, type: :ssh})
     end
 
     test "updates used_at", %{user: user} do
@@ -112,16 +117,12 @@ defmodule GitWerk.AccountsTest do
       assert hostile_user.id == key.user_id
     end
 
-    test "only accept a valid ssh key", %{user: user} do
-      Enum.each @valid_key_prefix, fn valid_key ->
-        key = "#{valid_key} AAAAB3NzaC1yc2EAA user@localhost"
-        {res, _} = Accounts.create_key(user, %{title: @key_title,  key: key, type: :ssh})
-        assert res == :ok, "failed to save key:  '#{key}'"
-      end
-    end
-
     test "doesn't allow to save wrong key", %{user: user} do
       {:error, _} = Accounts.create_key(user, %{title: @key_title,  key: @invalid_key, type: :ssh})
+    end
+
+    test "doesn't allow to save semi correct key", %{user: user} do
+      {:error, _} = Accounts.create_key(user, %{title: @key_title,  key: @semi_valid_key, type: :ssh})
     end
   end
 end
