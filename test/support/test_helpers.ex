@@ -21,6 +21,10 @@ defmodule GitWerk.TestHelpers do
     key
   end
 
+  def user_key_fixture_context(%{user: user}) do
+    {:ok, user_key: fixture(:user_key, %{user: user})}
+  end
+
   def user_fixture(attrs \\ %{}) do
     user = rand_str()
     valid_user = %{email: "#{user}@email.com", password: "some password_hash", username: user}

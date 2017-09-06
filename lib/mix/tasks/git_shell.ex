@@ -1,13 +1,16 @@
 defmodule Mix.Tasks.GitShell do
   def run(args) do
-    args
-    |> OptionParser.parse
-    |> IO.inspect
-    node_name = Base.decode16(:crypto.strong_rand_bytes(9))
-    :net_kernel.start([node_name, :shortnames])
+    {[key: key, command: command], _, _} = OptionParser.parse(args)
+    node_name = Base.encode16(:crypto.strong_rand_bytes(9))
+    {:ok, _} = :net_kernel.start([String.to_atom(node_name), :shortnames])
     {:ok, hostname} = :inet.gethostname
-    node = :"gitwerk_srv@#{hostname}"
-    :rpc.call(node, :lists, :sort, [[1, 2, 4, -1, 8, 3]])
-    |> IO.inspect
+    main_node = :"gitwerk_srv@#{hostname}"
+    resp = :rpc.call(main_node, :"Elixir.GitWerkGuts.Ssh", :get_git_command, [command, key])
+    if resp == "" do
+      IO.puts ""
+    else
+      IO.puts resp
+    end
+    System.halt(0)
   end
 end

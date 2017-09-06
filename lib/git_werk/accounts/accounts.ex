@@ -37,6 +37,15 @@ defmodule GitWerk.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  def get_user_by(key_id: key_id) do
+    (from k in UserKey,
+    where: k.id == ^key_id,
+    preload: [:user])
+    |> Repo.one
+    |> Kernel.||(%{})
+    |> Map.get(:user)
+  end
+
   def get_user_by(condition), do: Repo.get_by(User, condition)
 
   @doc """
