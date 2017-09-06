@@ -9,6 +9,9 @@ config :git_werk, GitWerk.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
+# Print only warnings and errors during test
+config :logger, level: :warn
+
 config :git_werk, GitWerk.Projects.Git,
   git_home_dir:  Path.join([Path.expand("."), "priv", "test"])
 
