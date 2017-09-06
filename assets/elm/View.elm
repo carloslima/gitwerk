@@ -47,7 +47,7 @@ viewSignIn page user =
             ]
 
         Just user ->
-            [ navbarLink False Route.Home [ text ("welcome " ++ (usernameToString user.username)) ]
+            [ navbarLink True Route.UserSettingKey [ text ((usernameToString user.username) ++ " profile") ]
             , navbarLink True Route.NewRepository [ text ("Create Repo") ]
             , navbarLink True Route.Logout [ text "Sign out" ]
             ]
