@@ -85,89 +85,57 @@ view session model =
             , css "width" "408px"
             , css "margin" "auto"
             ]
-            [ grid
+            [ viewForm (model)
+            ]
+        ]
+
+
+viewForm : Model -> Html Msg
+viewForm model =
+    grid
+        []
+        [ cell [ Grid.size All 12 ]
+            [ div
                 []
-                [ cell [ Grid.size All 12 ]
-                    [ div
-                        []
-                        [ Textfield.render Mdl
-                            [ 0 ]
-                            model.mdl
-                            [ Textfield.label "username"
-                            , Textfield.floatingLabel
-                            , Textfield.text_
-                            ]
-                            []
-                        ]
-                    , div []
-                        [ Textfield.render Mdl
-                            [ 2 ]
-                            model.mdl
-                            [ Textfield.label "Enter password"
-                            , Textfield.floatingLabel
-                            , Textfield.password
-                            , Options.onInput SetPassword
-                            ]
-                            []
-                        ]
-                    , div []
-                        [ Button.render Mdl
-                            [ 3 ]
-                            model.mdl
-                            [ Button.raised
-                            , Button.ripple
-                            , Button.colored
-                            , Options.onClick SubmitForm
-                            ]
-                            [ text "Sign in" ]
-                        ]
-                    , Options.styled div
-                        [ Typo.body1 ]
-                        [ text "or "
-                        , a [ Route.href Route.Join ] [ text "create an account" ]
-                        ]
+                [ Textfield.render Mdl
+                    [ 0 ]
+                    model.mdl
+                    [ Textfield.label "username"
+                    , Textfield.floatingLabel
+                    , Textfield.text_
+                    , Textfield.error ("Doesn't match") |> Options.when (not <| List.isEmpty (model.errors))
                     ]
+                    []
+                ]
+            , div []
+                [ Textfield.render Mdl
+                    [ 2 ]
+                    model.mdl
+                    [ Textfield.label "Password"
+                    , Textfield.floatingLabel
+                    , Textfield.password
+                    , Options.onInput SetPassword
+                    , Textfield.error ("Doesn't match") |> Options.when (not <| List.isEmpty (model.errors))
+                    ]
+                    []
+                ]
+            , div []
+                [ Button.render Mdl
+                    [ 3 ]
+                    model.mdl
+                    [ Button.raised
+                    , Button.ripple
+                    , Button.colored
+                    , Options.onClick SubmitForm
+                    ]
+                    [ text "Sign in" ]
+                ]
+            , Options.styled div
+                [ Typo.body1 ]
+                [ text "or "
+                , a [ Route.href Route.Join ] [ text "create an account" ]
                 ]
             ]
-        ]
-
-
-view2 : Session -> Model -> Html Msg
-view2 session model =
-    div [ class "auth-page" ]
-        [ div [ class "container page" ]
-            [ div [ class "row" ]
-                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
-                    [ h1 [ class "text-xs-center" ] [ text "Login" ]
-                    , p [ class "text-xs-center" ]
-                        [ a [ Route.href Route.Join ]
-                            [ text "Need an account?" ]
-                        ]
-                    , Form.viewErrors model.errors
-                    , viewForm
-                    ]
-                ]
-            ]
-        ]
-
-
-viewForm : Html Msg
-viewForm =
-    Html.form [ onSubmit SubmitForm ]
-        [ Form.input
-            [ class "form-control-lg"
-            , placeholder "Username"
-            , onInput SetUsername
-            ]
-            []
-        , Form.password
-            [ class "form-control-lg"
-            , placeholder "Password"
-            , onInput SetPassword
-            ]
-            []
-        , button [ class "btn btn-lg btn-primary pull-xs-right" ]
-            [ text "Sign in" ]
         ]
 
 

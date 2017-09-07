@@ -6,6 +6,8 @@ import Html.Lazy exposing (lazy2)
 import Route exposing (Route)
 import Util exposing ((=>))
 import User.UserData exposing (User, usernameToString)
+import Material.Typography as Typo
+import Material.Options as Options
 
 
 type ActivePage
@@ -29,7 +31,8 @@ viewHeader page user isLoading =
     case page of
         Login ->
             div []
-            []
+                []
+
         _ ->
             nav [ class "navbar navbar-toggleable-md navbar-light bg-faded" ]
                 [ a [ class "navbar-brand", Route.href Route.Home ]
@@ -84,7 +87,9 @@ navbarLink isActive route linkContent =
 viewFooter : Html msg
 viewFooter =
     footer []
-        [ div [ class "container" ]
+        [ Options.styled div
+            [ Typo.body1
+            ]
             [ a [ class "logo-font", href "/" ] [ text "gitwerk" ]
             , span [ class "attribution" ]
                 [ text " is a web-based Git repository manager"

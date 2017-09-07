@@ -62,3 +62,6 @@ config :git_werk, GitWerk.Projects.Git,
 
 config :git_werk, GitWerkGuts.SshAuthorizedKeys,
   authorized_keys_file: Path.join([Path.expand("."), "priv", "dev", ".ssh", "authorized_keys2"])
+
+config :cors_plug,
+  origin: ["http://localhost:3000"]
