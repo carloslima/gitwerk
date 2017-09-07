@@ -23,6 +23,11 @@ import Debug
 import View
 import Helpers.Page.Errored as Errored exposing (PageLoadError)
 
+import Material
+
+type alias Mdl =
+    Material.Model
+
 
 type Page
     = Blank
@@ -44,6 +49,7 @@ type PageState
 type alias Model =
     { pageState : PageState
     , session : Session
+    , mdl : Material.Model
     }
 
 
@@ -58,6 +64,7 @@ type Msg
     | UserKeyLoaded (Result PageLoadError User.SettingKeyPage.Model)
     | UserSettingKeyMsg User.SettingKeyPage.Msg
     | SetUser (Maybe User)
+    | Mdl (Material.Msg Msg)
 
 
 initialPage : Page
@@ -335,6 +342,7 @@ init val location =
     setRoute (Route.fromLocation location)
         { pageState = Loaded initialPage
         , session = { user = User.decodeUserFromJson val }
+        , mdl = Material.model
         }
 
 

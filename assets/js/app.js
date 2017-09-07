@@ -19,20 +19,3 @@
 // paths "./socket" or full ones "web/static/js/socket".
 
 // import socket from "./socket"
-
-import Elm from './main';
-
-const elmDiv = document.querySelector('#elm_target');
-
-if (elmDiv) {
-    var app = Elm.Main.embed(elmDiv, localStorage.session || null);
-
-    app.ports.storeSession.subscribe(function(session) {
-        localStorage.session = session;
-    });
-    window.addEventListener("storage", function(event) {
-        if (event.storageArea === localStorage && event.key === "session") {
-            app.ports.onSessionChange.send(event.newValue);
-        }
-    }, false);
-}

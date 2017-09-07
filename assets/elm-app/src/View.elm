@@ -26,16 +26,21 @@ frame isLoading user page content =
 
 viewHeader : ActivePage -> Maybe User -> Bool -> Html msg
 viewHeader page user isLoading =
-    nav [ class "navbar navbar-toggleable-md navbar-light bg-faded" ]
-        [ a [ class "navbar-brand", Route.href Route.Home ]
-            [ text "gitwerk" ]
-        , div [ class "collapse navbar-collapse" ]
-            [ ul [ class "navbar-nav mr-auto" ] <|
-                lazy2 viewIf isLoading spinner
-                    :: (navbarLink (page == Home) Route.Home [ text "Home" ])
-                    :: viewSignIn page user
-            ]
-        ]
+    case page of
+        Login ->
+            div []
+            []
+        _ ->
+            nav [ class "navbar navbar-toggleable-md navbar-light bg-faded" ]
+                [ a [ class "navbar-brand", Route.href Route.Home ]
+                    [ text "gitwerk" ]
+                , div [ class "collapse navbar-collapse" ]
+                    [ ul [ class "navbar-nav mr-auto" ] <|
+                        lazy2 viewIf isLoading spinner
+                            :: (navbarLink (page == Home) Route.Home [ text "Home" ])
+                            :: viewSignIn page user
+                    ]
+                ]
 
 
 viewSignIn : ActivePage -> Maybe User -> List (Html msg)
