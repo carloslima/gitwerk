@@ -33,6 +33,11 @@ viewHeader page user isLoading =
             div []
                 []
 
+        Join ->
+            div []
+                []
+
+
         _ ->
             nav [ class "navbar navbar-toggleable-md navbar-light bg-faded" ]
                 [ a [ class "navbar-brand", Route.href Route.Home ]

@@ -14,19 +14,32 @@ import Route
 import User.UserData as User exposing (User)
 import User.UserRequest as UserRequest
 import Helpers.Request.ErrorsData as ErrorsData
-import Debug
+import Dict exposing (Dict)
+
+
+-- Material
+
+import Material.Grid as Grid exposing (align, offset, grid, cell, Device(..))
+import Material.Options as Options exposing (cs, css, Style, when)
+import Material.Elevation as Elevation
+import Material.Button as Button
+import Material.Typography as Typo
+import Material
+import Material.Textfield as Textfield
 
 
 type alias Model =
-    { errors : List (String, String)
+    { errors : Dict String (List String)
     , username : String
     , email : String
     , password : String
+    , mdl : Material.Model
     }
 
 
 type Msg
-    = SetEmail String
+    = Mdl (Material.Msg Msg)
+    | SetEmail String
     | SetPassword String
     | SetUsername String
     | SubmitForm
@@ -51,56 +64,105 @@ type ExternalMsg
 
 initialModel : Model
 initialModel =
-    { errors = []
+    { errors = Dict.empty
     , username = ""
     , email = ""
     , password = ""
+    , mdl = Material.model
     }
 
 
-view : Model -> Html.Html Msg
+view : Model -> Html Msg
 view model =
-    div [ class "auth-page" ]
-        [ div [ class "container page" ]
-            [ div [ class "row" ]
-                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
-                    [ h1 [ class "text-xs-center" ] [ text "Join" ]
-                    , p [ class "text-xs-center" ]
-                        [ a [ Route.href Route.Login ]
-                            [ text "Have an account?" ]
+    div []
+        [ grid []
+            [ cell [ Grid.size Phone 4, Grid.size Tablet 6, offset Tablet 1, Grid.size Desktop 8, offset Desktop 2 ]
+                [ h4 [] [ text "Join GitWerk" ]
+                ]
+            ]
+        , Options.div
+            [ Elevation.e4
+            , Options.center
+            , css "width" "408px"
+            , css "margin" "auto"
+            ]
+            [ viewForm (model)
+            ]
+        ]
+
+
+viewForm : Model -> Html Msg
+viewForm model =
+    let
+        general_err =
+            Form.anyDefaultError "default_error" model.errors
+    in
+        Html.form [ onSubmit SubmitForm ]
+            [ grid
+                []
+                [ cell [ Grid.size All 12 ]
+                    [ Options.styled div
+                        [ css "color" "red"
+                        , Typo.center
+                        , Typo.body2
                         ]
-                    , Form.viewErrors model.errors
-                    , viewForm
+                        [ text (Maybe.withDefault "" general_err) ]
+                    , div
+                        []
+                        [ Textfield.render Mdl
+                            [ 0 ]
+                            model.mdl
+                            [ Textfield.label "username"
+                            , Textfield.floatingLabel
+                            , Textfield.text_
+                            , Form.textfieldShowErrorIfAny "username" model.errors
+                            , Options.onInput SetUsername
+                            ]
+                            []
+                        ]
+                    , div
+                        []
+                        [ Textfield.render Mdl
+                            [ 1 ]
+                            model.mdl
+                            [ Textfield.label "Email"
+                            , Textfield.floatingLabel
+                            , Textfield.text_
+                            , Form.textfieldShowErrorIfAny "email" model.errors
+                            , Options.onInput SetEmail
+                            ]
+                            []
+                        ]
+                    , div []
+                        [ Textfield.render Mdl
+                            [ 2 ]
+                            model.mdl
+                            [ Textfield.label "Password"
+                            , Textfield.floatingLabel
+                            , Textfield.password
+                            , Options.onInput SetPassword
+                            , Form.textfieldShowErrorIfAny "password" model.errors
+                            ]
+                            []
+                        ]
+                    , div []
+                        [ Button.render Mdl
+                            [ 3 ]
+                            model.mdl
+                            [ Button.raised
+                            , Button.ripple
+                            , Button.colored
+                            , Options.onClick SubmitForm
+                            ]
+                            [ text "Sign up" ]
+                        ]
+                    , Options.styled div
+                        [ Typo.body1 ]
+                        [ a [ Route.href Route.Login ] [ text "Have an account?" ]
+                        ]
                     ]
                 ]
             ]
-        ]
-
-
-viewForm : Html Msg
-viewForm =
-    Html.form [ onSubmit SubmitForm ]
-        [ Form.input
-            [ class "form-control-lg"
-            , placeholder "Username"
-            , onInput SetUsername
-            ]
-            []
-        , Form.input
-            [ class "form-control-lg"
-            , placeholder "Email"
-            , onInput SetEmail
-            ]
-            []
-        , Form.password
-            [ class "form-control-lg"
-            , placeholder "Password"
-            , onInput SetPassword
-            ]
-            []
-        , button [ class "btn btn-lg btn-primary pull-xs-right" ]
-            [ text "Sign up" ]
-        ]
 
 
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
@@ -122,26 +184,32 @@ update msg model =
                 => NoOp
 
         SubmitForm ->
-            { model | errors = [] }
+            { model | errors = Dict.empty }
                 => Http.send RegisterCompleted (UserRequest.register model)
                 => NoOp
 
         RegisterCompleted (Err error) ->
             let
-                errorMessages = ErrorsData.httpErrorToList "registration" error errorsDecoder
+                errorMessages =
+                    ErrorsData.httpErrorToList2 "registration" error errorsDecoder
             in
-                { model | errors = List.map (\errorMessage -> "Form" => errorMessage) errorMessages }
+                { model | errors = errorMessages }
                     => Cmd.none
                     => NoOp
 
         RegisterCompleted (Ok user) ->
             model
-            => Cmd.batch [UserRequest.storeSession user, Route.modifyUrl Route.Home]
-            => SetUser user
+                => Cmd.batch [ UserRequest.storeSession user, Route.modifyUrl Route.Home ]
+                => SetUser user
 
-errorsDecoder : Decoder (List String)
+        Mdl msg_ ->
+            Material.update Mdl msg_ model
+                => NoOp
+
+
+errorsDecoder : Decoder (List ( String, List String ))
 errorsDecoder =
-    decode (\email username password -> List.concat [ email, username, password ])
+    decode (\email username password -> List.concat [ [ ( "email", email ) ], [ ( "username", username ) ], [ ( "password", password ) ] ])
         |> ErrorsData.optionalError "email"
         |> ErrorsData.optionalError "username"
         |> ErrorsData.optionalError "password"

@@ -14,6 +14,7 @@ import User.UserRequest as UserRequest
 import Util exposing ((=>))
 import Helpers.Request.ErrorsData as ErrorsData
 import Route
+import Dict exposing (Dict)
 
 
 -- Material
@@ -28,7 +29,7 @@ import Material.Textfield as Textfield
 
 
 type alias Model =
-    { errors : List Error
+    { errors : Dict String (List String)
     , username : String
     , password : String
     , mdl : Material.Model
@@ -37,7 +38,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { errors = []
+    { errors = Dict.empty
     , username = ""
     , password = ""
     , mdl = Material.model
@@ -92,51 +93,64 @@ view session model =
 
 viewForm : Model -> Html Msg
 viewForm model =
-    grid
-        []
-        [ cell [ Grid.size All 12 ]
-            [ div
+    let
+        general_err =
+            Form.anyDefaultError "default_error" model.errors
+    in
+        Html.form [ onSubmit SubmitForm ]
+            [ grid
                 []
-                [ Textfield.render Mdl
-                    [ 0 ]
-                    model.mdl
-                    [ Textfield.label "username"
-                    , Textfield.floatingLabel
-                    , Textfield.text_
-                    , Textfield.error ("Doesn't match") |> Options.when (not <| List.isEmpty (model.errors))
+                [ cell [ Grid.size All 12 ]
+                    [ Options.styled div
+                        [ css "color" "red"
+                        , Typo.center
+                        , Typo.body2
+                        ]
+                        [ text (Maybe.withDefault "" general_err) ]
+                    , div
+                        []
+                        [ Textfield.render Mdl
+                            [ 0 ]
+                            model.mdl
+                            [ Textfield.label "username"
+                            , Textfield.floatingLabel
+                            , Textfield.text_
+                            , Form.textfieldShowErrorIfAny "username" model.errors
+                            , Options.onInput SetUsername
+                            ]
+                            []
+                        ]
+                    , div []
+                        [ Textfield.render Mdl
+                            [ 2 ]
+                            model.mdl
+                            [ Textfield.label "Password"
+                            , Textfield.floatingLabel
+                            , Textfield.password
+                            , Options.onInput SetPassword
+                            , Form.textfieldShowErrorIfAny "password" model.errors
+                            ]
+                            []
+                        ]
+                    , div []
+                        [ Button.render Mdl
+                            [ 3 ]
+                            model.mdl
+                            [ Button.raised
+                            , Button.ripple
+                            , Button.colored
+                            , Options.onClick SubmitForm
+                            ]
+                            [ text "Sign in" ]
+                        ]
+                    , Options.styled div
+                        [ Typo.body1 ]
+                        [ text "or "
+                        , a [ Route.href Route.Join ] [ text "create an account" ]
+                        ]
                     ]
-                    []
-                ]
-            , div []
-                [ Textfield.render Mdl
-                    [ 2 ]
-                    model.mdl
-                    [ Textfield.label "Password"
-                    , Textfield.floatingLabel
-                    , Textfield.password
-                    , Options.onInput SetPassword
-                    , Textfield.error ("Doesn't match") |> Options.when (not <| List.isEmpty (model.errors))
-                    ]
-                    []
-                ]
-            , div []
-                [ Button.render Mdl
-                    [ 3 ]
-                    model.mdl
-                    [ Button.raised
-                    , Button.ripple
-                    , Button.colored
-                    , Options.onClick SubmitForm
-                    ]
-                    [ text "Sign in" ]
-                ]
-            , Options.styled div
-                [ Typo.body1 ]
-                [ text "or "
-                , a [ Route.href Route.Join ] [ text "create an account" ]
                 ]
             ]
-        ]
 
 
 update : Msg -> Model -> ( ( Model, Cmd Msg ), ExternalMsg )
@@ -153,16 +167,16 @@ update msg model =
                 => NoOp
 
         SubmitForm ->
-            { model | errors = [] }
+            { model | errors = Dict.empty }
                 => Http.send LoginCompleted (UserRequest.login model)
                 => NoOp
 
         LoginCompleted (Err error) ->
             let
                 errorMessages =
-                    ErrorsData.httpErrorToList "registration" error errorsDecoder
+                    ErrorsData.httpErrorToList2 "login" error errorsDecoder
             in
-                { model | errors = List.map (\errorMessage -> Form => errorMessage) errorMessages }
+                { model | errors = errorMessages }
                     => Cmd.none
                     => NoOp
 
@@ -176,8 +190,8 @@ update msg model =
                 => NoOp
 
 
-errorsDecoder : Decoder (List String)
+errorsDecoder : Decoder (List ( String, List String ))
 errorsDecoder =
-    decode (\username password -> List.concat [ username, password ])
+    decode (\username password -> List.concat [ [ ( "username", username ) ], [ ( "password", password ) ] ])
         |> ErrorsData.optionalError "username"
         |> ErrorsData.optionalError "password"
