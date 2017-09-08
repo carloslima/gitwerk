@@ -8,6 +8,8 @@ import Util exposing ((=>))
 import User.UserData exposing (User, usernameToString)
 import Material.Typography as Typo
 import Material.Options as Options
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
 
 
 type ActivePage
@@ -19,8 +21,9 @@ type ActivePage
 
 frame : Bool -> Maybe User -> ActivePage -> Html msg -> Html msg
 frame isLoading user page content =
-    div [ class "page-frame" ]
-        [ viewHeader page user isLoading
+    Grid.container []
+        [ CDN.stylesheet
+        , viewHeader page user isLoading
         , content
         , viewFooter
         ]
@@ -36,7 +39,6 @@ viewHeader page user isLoading =
         Join ->
             div []
                 []
-
 
         _ ->
             nav [ class "navbar navbar-toggleable-md navbar-light bg-faded" ]

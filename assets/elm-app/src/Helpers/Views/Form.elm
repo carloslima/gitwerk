@@ -1,4 +1,4 @@
-module Helpers.Views.Form exposing (viewErrors, input, select, textarea, password, radio, fieldset, textfieldShowErrorIfAny, anyDefaultError)
+module Helpers.Views.Form exposing (viewErrors, input, select, textarea, password, radio, fieldset, textfieldShowErrorIfAny, anyDefaultError, getErrorFor)
 
 import Html exposing (fieldset, ul, li, Html, Attribute, text, select)
 import Html.Attributes exposing (class, type_)
@@ -88,5 +88,5 @@ control :
     -> List (Html msg)
     -> Html msg
 control element attributes children =
-    Html.fieldset [ class "form-group" ]
-        [ element (class "form-control" :: attributes) children ]
+    Html.fieldset []
+        [ element (attributes) children ]

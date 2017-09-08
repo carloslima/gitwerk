@@ -17,22 +17,22 @@ import Route
 import Dict exposing (Dict)
 
 
--- Material
+-- Bootstrap
 
-import Material.Grid as Grid exposing (align, offset, grid, cell, Device(..))
-import Material.Options as Options exposing (cs, css, Style, when)
-import Material.Elevation as Elevation
-import Material.Button as Button
-import Material.Typography as Typo
-import Material
-import Material.Textfield as Textfield
+import Bootstrap.Form as BForm
+import Bootstrap.Form.Input as BInput
+import Bootstrap.Form.Fieldset as BFieldset
+import Bootstrap.Button as BButton
+import Bootstrap.Alert as BAlert
+import Bootstrap.Grid as BGrid
+import Bootstrap.Grid.Row as BRow
+import Bootstrap.Grid.Col as BCol
 
 
 type alias Model =
     { errors : Dict String (List String)
     , username : String
     , password : String
-    , mdl : Material.Model
     }
 
 
@@ -41,7 +41,6 @@ initialModel =
     { errors = Dict.empty
     , username = ""
     , password = ""
-    , mdl = Material.model
     }
 
 
@@ -52,8 +51,7 @@ type Field
 
 
 type Msg
-    = Mdl (Material.Msg Msg)
-    | SetUsername String
+    = SetUsername String
     | SetPassword String
     | SubmitForm
     | LoginCompleted (Result Http.Error User)
@@ -75,18 +73,21 @@ type ExternalMsg
 view : Session -> Model -> Html Msg
 view session model =
     div []
-        [ grid []
-            [ cell [ Grid.size Phone 4, Grid.size Tablet 6, offset Tablet 1, Grid.size Desktop 8, offset Desktop 2 ]
-                [ h4 [] [ text "Sign in to GitWerk" ]
+        [ h4 [] [ text "Sign in to GitWerk" ]
+        , BGrid.row [BRow.middleXs]
+            [ BGrid.col [ BCol.md6, BCol.offsetMd3 ]
+                [ div
+                    [ style
+                        [ "margin" => "auto"
+                        , "width" => "408px"
+                        , "border" => "solid #f7f7f9"
+                        , "border-width" => ".2rem"
+                        , "padding" => "50px"
+                        ]
+                    ]
+                    [ viewForm (model)
+                    ]
                 ]
-            ]
-        , Options.div
-            [ Elevation.e4
-            , Options.center
-            , css "width" "408px"
-            , css "margin" "auto"
-            ]
-            [ viewForm (model)
             ]
         ]
 
@@ -95,60 +96,34 @@ viewForm : Model -> Html Msg
 viewForm model =
     let
         general_err =
-            Form.anyDefaultError "default_error" model.errors
+            case Form.anyDefaultError "default_error" model.errors of
+                Nothing ->
+                    text ""
+
+                Just err ->
+                    BAlert.danger [ text err ]
     in
-        Html.form [ onSubmit SubmitForm ]
-            [ grid
-                []
-                [ cell [ Grid.size All 12 ]
-                    [ Options.styled div
-                        [ css "color" "red"
-                        , Typo.center
-                        , Typo.body2
-                        ]
-                        [ text (Maybe.withDefault "" general_err) ]
-                    , div
-                        []
-                        [ Textfield.render Mdl
-                            [ 0 ]
-                            model.mdl
-                            [ Textfield.label "username"
-                            , Textfield.floatingLabel
-                            , Textfield.text_
-                            , Form.textfieldShowErrorIfAny "username" model.errors
-                            , Options.onInput SetUsername
-                            ]
-                            []
-                        ]
-                    , div []
-                        [ Textfield.render Mdl
-                            [ 2 ]
-                            model.mdl
-                            [ Textfield.label "Password"
-                            , Textfield.floatingLabel
-                            , Textfield.password
-                            , Options.onInput SetPassword
-                            , Form.textfieldShowErrorIfAny "password" model.errors
-                            ]
-                            []
-                        ]
-                    , div []
-                        [ Button.render Mdl
-                            [ 3 ]
-                            model.mdl
-                            [ Button.raised
-                            , Button.ripple
-                            , Button.colored
-                            , Options.onClick SubmitForm
-                            ]
-                            [ text "Sign in" ]
-                        ]
-                    , Options.styled div
-                        [ Typo.body1 ]
-                        [ text "or "
-                        , a [ Route.href Route.Join ] [ text "create an account" ]
-                        ]
+        BForm.form [ onSubmit SubmitForm ]
+            [ div []
+                [ general_err ]
+            , BForm.group []
+                [ BForm.label [ for "username" ] [ text "Username or Email" ]
+                , BInput.text
+                    [ BInput.id "username"
+                    , BInput.onInput SetUsername
                     ]
+                ]
+            , BForm.group []
+                [ BForm.label [ for "password" ] [ text "Password" ]
+                , BInput.password
+                    [ BInput.id "password"
+                    , BInput.onInput SetPassword
+                    ]
+                ]
+            , BButton.button [ BButton.primary ] [ text "Sign in" ]
+            , div []
+                [ text "or "
+                , a [ Route.href Route.Join ] [ text "create an account" ]
                 ]
             ]
 
@@ -184,10 +159,6 @@ update msg model =
             model
                 => Cmd.batch [ UserRequest.storeSession user, Route.modifyUrl Route.Home ]
                 => SetUser user
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
-                => NoOp
 
 
 errorsDecoder : Decoder (List ( String, List String ))
