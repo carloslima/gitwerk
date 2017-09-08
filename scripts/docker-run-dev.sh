@@ -9,6 +9,6 @@ rm -rf /home/git/repositories
 ln -s /home/git/gitwerk/priv/dev/repositories /home/git/repositories
 sudo /usr/sbin/sshd -D &
 cd assets/elm-app
-elm-app start &
+/node_modules/.bin/elm-app start &
 cd ../../
 iex --sname gitwerk_srv -S mix phx.server

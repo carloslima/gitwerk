@@ -24,7 +24,7 @@ RUN adduser --disabled-login --gecos 'Gitwerk' git && \
     sudo -u git -H git config --global repack.writeBitmaps true
 
 
-RUN npm install create-elm-app -g
+RUN npm install create-elm-app
 
 RUN sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen && update-locale LC_ALL=en_US.UTF-8
