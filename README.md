@@ -14,7 +14,9 @@ you can connect to ssh using
 ssh -T -p 2222 git@localhost
 ```
 
-and visit the webpage using [`localhost:4000`](http://localhost:4000)
+and visit the main ui using [`localhost:3000`](http://localhost:3000) and api using
+[`localhost:4000`](http://localhost:4000)
+
 
 and then follow the normal setup
 
@@ -26,4 +28,3 @@ To start your Phoenix server:
   * Install Node.js dependencies with `cd assets && npm install`
   * Start Phoenix endpoint with `mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.

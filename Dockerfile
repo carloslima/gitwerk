@@ -24,6 +24,8 @@ RUN adduser --disabled-login --gecos 'Gitwerk' git && \
     sudo -u git -H git config --global repack.writeBitmaps true
 
 
+RUN npm install create-elm-app -g
+
 RUN sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen && update-locale LC_ALL=en_US.UTF-8
 
@@ -34,4 +36,4 @@ RUN mkdir -p /run/sshd
 RUN echo "git ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/git-sudo-nopassword
 
 ENV LANG en_US.UTF-8
-EXPOSE 4000 2222
+EXPOSE 4000 2222 3000
