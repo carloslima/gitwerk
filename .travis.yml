@@ -45,13 +45,12 @@ install:
   - node --version
   - npm --version
   - npm install -g elm-use elm-test@0.18.3
+  - npm install create-elm-app -g
   - elm-use $ELM_VERSION
   - mv $(npm config get prefix)/bin/elm-make $(npm config get prefix)/bin/elm-make-old
   - printf '%s\n\n' '#!/bin/bash' 'echo "Running elm-make with sysconfcpus -n 2"' '$TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make-old "$@"' > $(npm config get prefix)/bin/elm-make
   - chmod +x $(npm config get prefix)/bin/elm-make
   - cd assets/elm-app
-  - travis_retry elm-package install --yes
-  - cd tests
   - travis_retry elm-package install --yes
   - cd ../../
   - mix local.hex --force
@@ -63,4 +62,4 @@ before_script:
 script:
   - mix test
   - cd assets/elm-app
-  - elm test
+  - elm-app test
