@@ -72,7 +72,11 @@ type ExternalMsg
 
 view : Session -> Model -> Html Msg
 view session model =
-    div []
+    div
+        [ class "jumbotron"
+        , style
+            [ "background" => "transparent" ]
+        ]
         [ h4 [] [ text "Sign in to GitWerk" ]
         , BGrid.row [ BRow.middleXs ]
             [ BGrid.col [ BCol.md6, BCol.offsetMd3 ]
