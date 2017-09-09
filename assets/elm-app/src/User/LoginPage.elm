@@ -74,7 +74,7 @@ view : Session -> Model -> Html Msg
 view session model =
     div []
         [ h4 [] [ text "Sign in to GitWerk" ]
-        , BGrid.row [BRow.middleXs]
+        , BGrid.row [ BRow.middleXs ]
             [ BGrid.col [ BCol.md6, BCol.offsetMd3 ]
                 [ div
                     [ style
@@ -95,23 +95,24 @@ view session model =
 viewForm : Model -> Html Msg
 viewForm model =
     let
-        general_err =
-            case Form.anyDefaultError "default_error" model.errors of
+        groupOption field errors =
+            case Form.getErrorFor field errors of
                 Nothing ->
-                    text ""
+                    []
 
-                Just err ->
-                    BAlert.danger [ text err ]
+                Just _ ->
+                    [ BForm.groupDanger ]
     in
         BForm.form [ onSubmit SubmitForm ]
             [ div []
-                [ general_err ]
-            , BForm.group []
+                [ Form.showDefaultErrorIfAny (model.errors) ]
+            , BForm.group (groupOption "username" model.errors)
                 [ BForm.label [ for "username" ] [ text "Username or Email" ]
                 , BInput.text
                     [ BInput.id "username"
                     , BInput.onInput SetUsername
                     ]
+                , Form.validationTextIfAny "username" model.errors
                 ]
             , BForm.group []
                 [ BForm.label [ for "password" ] [ text "Password" ]

@@ -1,12 +1,15 @@
-module Helpers.Views.Form exposing (viewErrors, input, select, textarea, password, radio, fieldset, textfieldShowErrorIfAny, anyDefaultError, getErrorFor)
+module Helpers.Views.Form exposing (viewErrors, input, select, textarea, password, radio, fieldset, textfieldShowErrorIfAny, anyDefaultError, getErrorFor, validationTextIfAny, showDefaultErrorIfAny)
 
 import Html exposing (fieldset, ul, li, Html, Attribute, text, select)
 import Html.Attributes exposing (class, type_)
 import Dict exposing (Dict)
+import Debug
 
 
 -- Material
 
+import Bootstrap.Form as BForm
+import Bootstrap.Alert as BAlert
 import Material.Options as Options
 import Material.Textfield as Textfield
 
@@ -70,12 +73,36 @@ textfieldShowErrorIfAny field errors =
 
 getErrorFor : String -> Dict String (List String) -> Maybe String
 getErrorFor field errors =
-    case Dict.get field errors of
-        Nothing ->
-            Nothing
+    let
+        _ =
+            Debug.log "sss" errors
+    in
+        case Dict.get field errors of
+            Nothing ->
+                Nothing
 
-        Just errs ->
-            List.head errs
+            Just errs ->
+                List.head errs
+
+
+validationTextIfAny : String -> Dict String (List String) -> Html msg
+validationTextIfAny field errors =
+    case getErrorFor field errors of
+        Nothing ->
+            text ""
+
+        Just err ->
+            BForm.validationText [] [ text err ]
+
+
+showDefaultErrorIfAny : Dict String (List String) -> Html msg
+showDefaultErrorIfAny errors =
+    case getErrorFor "default_error" errors of
+        Nothing ->
+            text ""
+
+        Just err ->
+            BAlert.danger [ text err ]
 
 
 
