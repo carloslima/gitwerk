@@ -38,6 +38,8 @@ defmodule GitWerkWeb.Endpoint do
     key: "_git_werk_key",
     signing_salt: "uEFxC3vm"
 
+  plug CORSPlug
+
   plug GitWerkWeb.Router
 
   @doc """
