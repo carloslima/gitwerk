@@ -6,8 +6,8 @@ import Html.Lazy exposing (lazy2)
 import Route exposing (Route)
 import Util exposing ((=>))
 import User.UserData exposing (User, usernameToString)
-import Material.Typography as Typo
-import Material.Options as Options
+
+-- Bootstrap
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 
@@ -94,9 +94,7 @@ navbarLink isActive route linkContent =
 viewFooter : Html msg
 viewFooter =
     footer []
-        [ Options.styled div
-            [ Typo.body1
-            ]
+        [ div [ ]
             [ a [ class "logo-font", href "/" ] [ text "gitwerk" ]
             , span [ class "attribution" ]
                 [ text " is a web-based Git repository manager"
