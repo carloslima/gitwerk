@@ -44,83 +44,93 @@ gravatarHeaderOption =
 
 viewHeader : ActivePage -> Maybe User -> Bool -> Html msg
 viewHeader page user isLoading =
-    let
-        userEmail =
-            case user of
-                Nothing ->
-                    ""
+    case user of
+        Nothing ->
+            text "sign in first"
 
-                Just user ->
-                    user.email
-    in
-        case page of
-            Login ->
-                div []
-                    []
+        Just user ->
+            viewHeaderWithuser page user isLoading
 
-            Join ->
-                div []
-                    []
 
-            _ ->
-                div
-                    [ style
-                        [ "background-color" => "#24292e"
-                        , "color" => "#FFF"
-                        ]
+viewHeaderWithuser : ActivePage -> User -> Bool -> Html msg
+viewHeaderWithuser page user isLoading =
+    case page of
+        Login ->
+            div []
+                []
+
+        Join ->
+            div []
+                []
+
+        _ ->
+            div
+                [ style
+                    [ "background-color" => "#24292e"
+                    , "color" => "#FFF"
                     ]
-                    [ Grid.container []
-                        [ header [ class "navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar" ]
-                            [ div [ class "navbar-nav-scroll" ]
-                                [ ul [ class "navbar-nav bd-navbar-nav flex-row" ]
-                                    [ lazy2 viewIf isLoading spinner
-                                    , li [ class "nav-item" ]
-                                        [ a [ class "nav-link ", Route.href Route.Home ]
-                                            [ text "Gitwerk" ]
-                                        ]
+                ]
+                [ Grid.container []
+                    [ header [ class "navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar" ]
+                        [ div [ class "navbar-nav-scroll" ]
+                            [ ul [ class "navbar-nav bd-navbar-nav flex-row" ]
+                                [ lazy2 viewIf isLoading spinner
+                                , li [ class "nav-item" ]
+                                    [ a [ class "nav-link ", Route.href Route.Home ]
+                                        [ text "Gitwerk" ]
                                     ]
                                 ]
-                            , ul [ class "navbar-nav flex-row ml-md-auto d-none d-md-flex" ]
-                                [ li [ class "nav-item dropdown" ]
-                                    [ a
-                                        [ class "nav-link dropdown-toggle"
-                                        , href "#"
-                                        , attribute "data-toggle" "dropdown"
-                                        ]
-                                        [ text "+" ]
-                                    , div [ class "dropdown-menu" ]
-                                        [ a
-                                            [ class "dropdown-item"
-                                            , Route.href Route.NewRepository
-                                            ]
-                                            [ text "Create Repo" ]
-                                        ]
+                            ]
+                        , ul [ class "navbar-nav flex-row ml-md-auto d-none d-md-flex" ]
+                            [ li [ class "nav-item dropdown" ]
+                                [ a
+                                    [ class "nav-link dropdown-toggle"
+                                    , href "#"
+                                    , attribute "data-toggle" "dropdown"
                                     ]
-                                , li [ class "nav-item dropdown" ]
+                                    [ text "+" ]
+                                , div [ class "dropdown-menu" ]
                                     [ a
-                                        [ class "nav-link dropdown-toggle"
-                                        , href "#"
-                                        , attribute "data-toggle" "dropdown"
+                                        [ class "dropdown-item"
+                                        , Route.href Route.NewRepository
                                         ]
-                                        [ Gravatar.img gravatarHeaderOption userEmail ]
-                                    , div [ class "dropdown-menu" ]
-                                        [ a
-                                            [ class "dropdown-item"
-                                            , Route.href Route.UserSettingKey
+                                        [ text "Create Repo" ]
+                                    ]
+                                ]
+                            , li [ class "nav-item dropdown" ]
+                                [ a
+                                    [ class "nav-link dropdown-toggle"
+                                    , href "#"
+                                    , attribute "data-toggle" "dropdown"
+                                    ]
+                                    [ Gravatar.img gravatarHeaderOption user.email ]
+                                , div [ class "dropdown-menu" ]
+                                    [ div
+                                        [ style
+                                            [ "color" => "#586069"
+                                            , "padding" => "3px"
                                             ]
-                                            [ text "Settings" ]
-                                        , a [ class "divider" ] []
-                                        , a
-                                            [ class "dropdown-item"
-                                            , Route.href Route.Logout
-                                            ]
-                                            [ text "Sign out" ]
                                         ]
+                                        [ text ("Signed in as " ++ user.username) ]
+                                    , div [ class "dropdown-divider" ]
+                                        []
+                                    , a
+                                        [ class "dropdown-item"
+                                        , Route.href Route.UserSettingKey
+                                        ]
+                                        [ text "Settings" ]
+                                    , a
+                                        [ class "dropdown-item"
+                                        , Route.href Route.Logout
+                                        ]
+                                        [ text "Sign out" ]
                                     ]
                                 ]
                             ]
                         ]
                     ]
+                ]
+
 
 viewSignIn : ActivePage -> Maybe User -> List (Html msg)
 viewSignIn page user =
