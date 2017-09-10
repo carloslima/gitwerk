@@ -20,6 +20,8 @@ import Util exposing ((=>))
 import Route
 import Helpers.Page.Errored as Errored exposing (PageLoadError, pageLoadError)
 import View
+import Gravatar
+import Octicons
 
 
 type alias Model =
@@ -42,6 +44,7 @@ type Msg
     = SetRepositoryName String
     | SetPrivacy PrivacyType
     | SubmitForm
+    | SetNamespace String
     | RepositoryCreated (Result Http.Error Repository)
 
 
@@ -91,7 +94,7 @@ initShow namespace repo tree cwd session =
                 )
 
 
-listFiles : Model -> Session -> List (String)-> Cmd MsgShow
+listFiles : Model -> Session -> List String -> Cmd MsgShow
 listFiles model session filePath =
     let
         authToken =
@@ -100,9 +103,11 @@ listFiles model session filePath =
         RepositoryRequest.listFiles model filePath authToken
             |> Http.send RepositoryLoadedFiles
 
-inPageReload: Model -> Session -> Cmd MsgShow
+
+inPageReload : Model -> Session -> Cmd MsgShow
 inPageReload model session =
     listFiles model session model.cwd
+
 
 viewShow : Session -> Model -> Html MsgShow
 viewShow session model =
@@ -140,20 +145,25 @@ viewListFilesLinks : Model -> File -> Html MsgShow
 viewListFilesLinks model file =
     div [] [ a [ Route.href (Route.ShowRepositoryTree model.namespace model.name model.tree (getCwd model file)) ] [ text file.name ] ]
 
+
 getCwd : Model -> File -> List String
 getCwd model file =
     case model.cwd of
         [] ->
-            [file.name]
+            [ file.name ]
+
         cwd ->
-            List.append cwd [file.name]
+            List.append cwd [ file.name ]
+
 
 internalLoadRepo : Session -> Model -> String -> List String -> ( Model, Cmd MsgShow )
 internalLoadRepo session model tree path =
     let
-        msg = LoadRepositoryTree tree path
+        msg =
+            LoadRepositoryTree tree path
     in
-    updateShow session msg model
+        updateShow session msg model
+
 
 updateShow : Session -> MsgShow -> Model -> ( Model, Cmd MsgShow )
 updateShow session msg model =
@@ -188,30 +198,77 @@ view session model =
 
 viewNewReo : User -> Model -> Html Msg
 viewNewReo user model =
-    div [ class "repo-page" ]
-        [ div [ class "container page" ]
-            [ div [ class "row" ]
-                [ div [ class "col-md-6 offset-md-3 col-xs-12" ]
-                    [ h1 [ class "text-xs-center" ] [ text "Create Repo" ]
-                    , Form.viewErrors model.errors
-                    , viewForm user
+    div
+        [ class "new-repo-page"
+        , style
+            [ "width" => "700px"
+            , "margin" => "40px auto 0"
+            ]
+        ]
+        [ div [ class "row" ]
+            [ div [ class "col-12 text-left" ]
+                [ div [ class "subhead" ]
+                    [ h2 [ class "subhead-heading" ] [ text "Create a new repository" ]
+                    , p [ class "subhead-description" ]
+                        [ text "A repository contains all the files for your project, including the revision history."
+                        ]
                     ]
+                , Form.viewErrors model.errors
+                , viewForm model user
                 ]
             ]
         ]
 
 
-viewForm : User -> Html Msg
-viewForm user =
+gravatarHeaderOption : Gravatar.Options
+gravatarHeaderOption =
+    Gravatar.defaultOptions
+        |> Gravatar.withSize (Just 30)
+        |> Gravatar.withDefault Gravatar.Retro
+
+
+viewForm : Model -> User -> Html Msg
+viewForm model user =
     Html.form [ onSubmit SubmitForm ]
-        [ Form.select [ class "form-control-lg" ] (allowedRepoSubNameOptions user)
-        , Form.input
-            [ class "form-control-lg"
-            , placeholder "Repository name"
-            , onInput SetRepositoryName
+        [ table [ class "new-repo-table" ]
+            [ tr []
+                [ th [] [ text "Owner" ]
+                , th [] [ text " " ]
+                , th [] [ text "Repository name" ]
+                ]
+            , tr []
+                [ td []
+                    [ ul [ class "navbar-nav flex-row ml-md-auto d-none d-md-flex" ]
+                        [ li [ class "nav-item dropdown" ]
+                            [ a
+                                [ class "nav-link dropdown-toggle"
+                                , href "#"
+                                , attribute "data-toggle" "dropdown"
+                                ]
+                                [ userSelector user ]
+                            , div [ class "dropdown-menu" ]
+                                [ a
+                                    [ class "dropdown-item"
+                                    , onClick (SetNamespace user.username)
+                                    ]
+                                    [ userSelector user ]
+                                ]
+                            ]
+                        ]
+                    ]
+                , td [ style [ "padding-left" => "5px" ] ] [ text "/" ]
+                , td []
+                    [ Form.input
+                        [ class "form-control"
+                        , style [ "width" => "250px" ]
+                        , onInput SetRepositoryName
+                        ]
+                        []
+                    ]
+                ]
             ]
-            []
-        , Form.fieldset [ class "form-control-lg" ]
+        , div [] [ p [] [] ]
+        , div [ class "form-checkbox" ]
             [ label []
                 [ Form.radio
                     [ onClick (SetPrivacy Private)
@@ -219,19 +276,42 @@ viewForm user =
                     , checked True
                     ]
                     []
+                , Octicons.defaultOptions |> Octicons.size 24 |> Octicons.lock
                 , text "Private"
                 ]
-            , label []
+            ]
+        , Form.fieldset [ class "form-checkbox" ]
+            [ label []
                 [ Form.radio
                     [ onClick (SetPrivacy Public)
                     , name "privacyPicker"
                     ]
                     []
+                , Octicons.defaultOptions |> Octicons.size 24 |> Octicons.repo
                 , text "Public"
                 ]
             ]
-        , button [ class "btn btn-lg btn-primary pull-xs-right" ]
+        , Html.hr [] []
+        , button [ class "btn btn-success", disabled (disableNewRepoBtn model) ]
             [ text "Create repository" ]
+        ]
+
+
+disableNewRepoBtn : Model -> Bool
+disableNewRepoBtn model =
+    case model.name of
+        "" ->
+            True
+
+        _ ->
+            False
+
+
+userSelector : User -> Html msg
+userSelector user =
+    span []
+        [ span [ class "gravatar" ] [ Gravatar.img gravatarHeaderOption user.email ]
+        , span [ style [ "padding-left" => "5px" ] ] [ text user.username ]
         ]
 
 
@@ -243,6 +323,10 @@ allowedRepoSubNameOptions user =
 update : Session -> Msg -> Model -> ( Model, Cmd Msg )
 update session msg model =
     case msg of
+        SetNamespace namespace ->
+            { model | namespace = namespace }
+                => Cmd.none
+
         SetRepositoryName repo_name ->
             { model | name = repo_name }
                 => Cmd.none
