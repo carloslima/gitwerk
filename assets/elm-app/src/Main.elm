@@ -272,7 +272,12 @@ setRoute maybeRoute model =
                 ( { model | pageState = Loaded NotFound }, Cmd.none )
 
             Just (Route.Home) ->
-                ( { model | pageState = Loaded (Home Home.MainPage.initialModel) }, Cmd.none )
+                case model.session.user of
+                    Nothing ->
+                        setRoute (Just Route.Login) model
+
+                    _ ->
+                        ( { model | pageState = Loaded (Home Home.MainPage.initialModel) }, Cmd.none )
 
             Just (Route.Login) ->
                 ( { model | pageState = Loaded (Login User.LoginPage.initialModel) }, Cmd.none )
