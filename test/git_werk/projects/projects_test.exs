@@ -13,8 +13,8 @@ defmodule GitWerk.ProjectsTest do
     @invalid_attrs %{name: nil, privacy: nil, user_id: nil}
 
     test "create/1 project with necessary resources", %{user: user} do
-      {:ok, repo} = Projects.create(user, @valid_attrs)
-      assert repo.repo
+      {:ok, project} = Projects.create(user, @valid_attrs)
+      assert project.repo
     end
 
     test "list_repositories/0 returns all repositories", %{user: user} do

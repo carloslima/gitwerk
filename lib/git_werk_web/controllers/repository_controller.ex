@@ -12,12 +12,14 @@ defmodule GitWerkWeb.RepositoryController do
   end
 
   def create(conn, %{"repository" => repo_params}) do
-    #params = %{name: repo_params["name"], privacy: repo_params["privacy"]}
     with user <- Guardian.Plug.current_resource(conn),
-         {:ok, repo} <- Projects.create(user, repo_params) do
+         {:ok, project} <- Projects.create(user, repo_params) do
            conn
            |> put_status(:created)
-           |> render("repository.json", repository: %{repo| user: user})
+           |> render("repository.json", repository: %{project.repo| user: user})
+    else
+      {:error, :repo, repo_ch, _} -> {:error, repo_ch}
+      e -> e
     end
   end
 

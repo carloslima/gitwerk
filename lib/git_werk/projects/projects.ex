@@ -15,12 +15,10 @@ defmodule GitWerk.Projects do
   """
   def create(%User{} = user, attrs \\ %{}) do
     attrs = attrs |> Map.put(:user_id, user.id)
-    with {:ok, repo} <- create_repository(attrs),
-         {:ok, git_pid} <- Git.create(user, repo) do
-           {:ok, %{repo| repo: git_pid}}
-    else
-     error -> error
-     end
+    Ecto.Multi.new
+    |> Ecto.Multi.insert(:repo, create_repository_changeset(attrs))
+    |> Ecto.Multi.run(:project_git_dir, fn %{repo: repo} -> Git.create(user, repo) end)
+    |> Repo.transaction
   end
 
   @doc """
@@ -76,9 +74,14 @@ defmodule GitWerk.Projects do
 
   """
   def create_repository(attrs \\ %{}) do
+    attrs
+    |> create_repository_changeset
+    |> Repo.insert()
+  end
+
+  def create_repository_changeset(attrs \\ %{}) do
     %Repository{}
     |> Repository.changeset(attrs)
-    |> Repo.insert()
   end
 
   @doc """

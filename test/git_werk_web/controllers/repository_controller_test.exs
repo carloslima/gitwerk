@@ -30,6 +30,23 @@ defmodule GitWerkWeb.RepositoryControllerTest do
     assert %{"id" => _} = json_response(conn, 201)
   end
 
+  test "doesn't allow two repo with same name", %{conn: conn} do
+    user = user_fixture()
+    first_conn =
+      conn
+      |> conn_with_auth(user)
+      |> post(repository_path(conn, :create), [repository: %{name: "my-repo", privacy: :public}])
+
+    assert %{"id" => _} = json_response(first_conn, 201)
+
+    sec_conn =
+      conn
+      |> conn_with_auth(user)
+      |> post(repository_path(conn, :create), [repository: %{name: "my-repo", privacy: :public}])
+
+    assert json_response(sec_conn, 422)
+  end
+
   test "gets a repository by its name for auth user", %{conn: conn} do
     user = user_fixture()
     repository = repository_fixture(user_id: user.id)

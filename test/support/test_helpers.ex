@@ -43,8 +43,8 @@ defmodule GitWerk.TestHelpers do
     repo_name = rand_str()
     valid_repo = %{name: repo_name, privacy: :private}
     attrs = Enum.into(attrs, valid_repo)
-    {:ok, repository} = Projects.create(user, attrs)
-    repository
+    {:ok, project} = Projects.create(user, attrs)
+    project.repo
   end
 
   def project_fixture_context(%{user: user}) do
