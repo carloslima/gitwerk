@@ -17,3 +17,6 @@ config :git_werk, GitWerk.Projects.Git,
 
 config :git_werk, GitWerkGuts.SshAuthorizedKeys,
   authorized_keys_file: Path.join([Path.expand("."), "priv", "test", ".ssh", "authorized_keys2"])
+
+config :git_werk, GitWerkGuts.SshServer,
+  priv_dir: Path.join([Path.expand("."), "priv/test/ssh_keys/"])
