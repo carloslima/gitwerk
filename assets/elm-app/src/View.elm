@@ -28,7 +28,7 @@ frame isLoading user page content =
     div []
         [ CDN.stylesheet
         , viewHeader page user isLoading
-        , Grid.container []
+        , div []
             [ content
             , viewFooter
             ]

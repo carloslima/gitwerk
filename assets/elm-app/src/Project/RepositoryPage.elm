@@ -15,6 +15,7 @@ import User.UserData exposing (User)
 import Project.RepositoryData exposing (Repository)
 import Project.FileData exposing (File)
 import Project.RepositoryRequest as RepositoryRequest
+import Project.View as ProjectView
 import Helpers.Request.ErrorsData as ErrorsData
 import Util exposing ((=>))
 import Route
@@ -111,9 +112,10 @@ inPageReload model session =
 
 viewShow : Session -> Model -> Html MsgShow
 viewShow session model =
-    div [ class "repo-first-page" ]
-        [ h1 [ class "text-xs-center" ]
-            [ text ("Show Repo " ++ model.name)
+    div [ class "repo-page" ]
+        [ ProjectView.projectHeader model
+        , h1 [ class "text-xs-center" ]
+            [ text (model.namespace ++ "/" ++ model.name)
             ]
         , div [] (viewListFiles model)
         ]
