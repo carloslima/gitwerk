@@ -32,13 +32,16 @@ suite =
                         SignupPage.RegisterCompleted (Err (Http.BadStatus resp))
 
                     model =
-                        (SignupPage.Model [] "" "" "")
+                        (SignupPage.Model (Dict.fromList []) "" "" "")
 
                     update_result =
                         SignupPage.update msg model
 
+                    error_list =
+                        [ ( "email", [ "email has already been taken" ] ), ( "password", [] ), ( "username", [] ) ]
+
                     expected_model =
-                        (SignupPage.Model [ ( "Form", "email has already been taken" ) ] "" "" "")
+                        (SignupPage.Model (Dict.fromList error_list) "" "" "")
                 in
                     Expect.equal update_result ( ( expected_model, Cmd.none ), SignupPage.NoOp )
         , test "handles other errors" <|
@@ -51,13 +54,16 @@ suite =
                         SignupPage.RegisterCompleted (Err (Http.BadStatus resp))
 
                     model =
-                        (SignupPage.Model [] "" "" "")
+                        (SignupPage.Model (Dict.fromList []) "" "" "")
 
                     update_result =
                         SignupPage.update msg model
 
+                    error_list =
+                        [("default_error",["unable to process registration"])]
+
                     expected_model =
-                        (SignupPage.Model [ ( "Form", "unable to process registration" ) ] "" "" "")
+                        (SignupPage.Model (Dict.fromList error_list) "" "" "")
                 in
                     Expect.equal update_result ( ( expected_model, Cmd.none ), SignupPage.NoOp )
         ]

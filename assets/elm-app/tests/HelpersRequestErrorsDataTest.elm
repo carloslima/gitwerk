@@ -29,21 +29,24 @@ suite =
                     resp =
                         Http.Response apiUrl { code = 422, message = "Unprocessable Entity" } (Dict.fromList []) anErrorMessage
 
-                    error = Http.BadStatus resp
+                    error =
+                        Http.BadStatus resp
 
-                    expected_resonse = ErrorsData.httpErrorToList "registration" error SignupPage.errorsDecoder
+                    expected_resonse =
+                        ErrorsData.httpErrorToList2 "registration" error SignupPage.errorsDecoder
                 in
-                    Expect.equal expected_resonse ["email has already been taken"]
+                    Expect.equal expected_resonse (Dict.fromList [ ( "email", [ "email has already been taken" ] ), ( "password", [] ), ( "username", [] ) ])
         , test "handles other errors" <|
             \_ ->
                 let
                     resp =
                         Http.Response apiUrl { code = 500, message = "Unprocessable Entity" } (Dict.fromList []) anErrorMessage
 
-                    error = Http.BadStatus resp
+                    error =
+                        Http.BadStatus resp
 
-                    expected_resonse = ErrorsData.httpErrorToList "registration" error SignupPage.errorsDecoder
+                    expected_resonse =
+                        ErrorsData.httpErrorToList2 "registration" error SignupPage.errorsDecoder
                 in
-                    Expect.equal expected_resonse ["unable to process registration"]
-
+                    Expect.equal expected_resonse (Dict.fromList [ ( "default_error", [ "unable to process registration" ] ) ])
         ]
