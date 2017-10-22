@@ -65,3 +65,7 @@ config :git_werk, GitWerkGuts.SshAuthorizedKeys,
 
 config :cors_plug,
   origin: ["http://localhost:3000"]
+
+config :git_werk, GitWerkGuts.SshServer,
+  priv_dir: Path.join([Path.expand("."), "priv/dev/ssh_keys/"]),
+  port: 8989
