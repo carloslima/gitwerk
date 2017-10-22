@@ -28,7 +28,7 @@ defmodule GitWerkGuts.SshServer do
 
   def handle_info(:start_ssh, state) do
     ssh_server_opts = Application.get_env(:git_werk, __MODULE__)
-    priv_dir = String.to_charlist(ssh_server_opts[:priv_dir])
+    priv_dir = String.to_charlist(ssh_server_opts[:system_dir])
     port = ssh_server_opts[:port] || 0
     {:ok, ssh_pid} = :ssh.daemon port, [system_dir: priv_dir, user_dir: priv_dir]
 
