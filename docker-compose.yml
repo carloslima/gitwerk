@@ -1,8 +1,25 @@
-version: "2"
+version: "3"
 services:
     pg:
-        image: postgres:9.6-alpine
-        ports:
-            - 5432:5432
-        environment:
-            POSTGRES_PASSWORD: postgres
+      image: postgres:9.6-alpine
+      ports:
+          - 5432:5432
+      environment:
+          POSTGRES_PASSWORD: postgres
+    gitwerk:
+      command: ./scripts/docker-run-dev.sh
+      build: .
+      ports:
+        - "4000:4000"
+        - "3000:3000"
+        - "2222:22"
+      volumes:
+      - .:/home/git/gitwerk
+      links:
+        - pg
+      working_dir: /home/git/gitwerk
+      user: git
+      environment:
+        DATABASE_USERNAME: postgres
+        DATABASE_PASSWORD: postgres
+        DATABASE_HOST: pg
