@@ -8,6 +8,7 @@ defmodule GitWerkGuts.Supervisor do
   def init(_opts) do
     conf = Application.get_env(:git_werk, GitWerkGuts.SshAuthorizedKeys)
     children = [
+      supervisor(Registry, [:unique, GitWerkGuts.SshSession]),
       worker(GitWerkGuts.SshServer, []),
       worker(GitWerkGuts.SshAuthorizedKeys, [[authorized_keys_file: conf[:authorized_keys_file]], :self_name]),
     ]
