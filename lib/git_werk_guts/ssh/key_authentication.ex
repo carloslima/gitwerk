@@ -8,6 +8,7 @@ defmodule GitWerkGuts.SshKeyAuthentication do
   Record.defrecord :DSAPrivateKey, Record.extract(:DSAPrivateKey, from_lib: "public_key/include/public_key.hrl")
   Record.defrecord :'Dss-Parms',   Record.extract(:'Dss-Parms', from_lib: "public_key/include/public_key.hrl")
 
+  alias GitWerk.Accounts
 
   @type public_key :: :public_key.public_key()
   @type private_key :: map | map | term
@@ -37,9 +38,22 @@ defmodule GitWerkGuts.SshKeyAuthentication do
   Checks if the user key is authorized.
   """
   @spec is_auth_key(binary, user, daemon_options) :: boolean
-  def is_auth_key(key, _user, daemon_options) do
-    true
+  def is_auth_key({:RSAPublicKey, _, _} = key, 'git', daemon_options) do
+    is_auth_key({key, []}, 'git', daemon_options)
   end
+
+  def is_auth_key(key, 'git', _daemon_options) do
+    key_str =
+      [key]
+      |> :public_key.ssh_encode(:auth_keys)
+      |> String.trim
+
+    case Accounts.get_key_by(key: key_str) do
+      nil -> false
+      _ -> true
+    end
+  end
+  def is_auth_key(_, _, _), do: false
 
   defp file_base_name(:"ssh-rsa"), do: "ssh_host_rsa_key"
   defp file_base_name(:"rsa-sha2-256"), do: "ssh_host_rsa_key"

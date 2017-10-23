@@ -155,4 +155,10 @@ defmodule GitWerk.Accounts do
     |> UserKey.key_is_used_ch
     |> Repo.update
   end
+
+  @doc """
+  """
+  def get_key_by(key: pub_key) do
+    Repo.get_by(UserKey, %{key: pub_key})
+  end
 end
