@@ -5,6 +5,7 @@ defmodule GitWerkGuts.SshServer do
   defstruct ssh_pid: nil
 
   use GenServer
+  require Logger
 
   alias __MODULE__
 
@@ -33,9 +34,16 @@ defmodule GitWerkGuts.SshServer do
     {:ok, ssh_pid} = :ssh.daemon port, system_dir: priv_dir,
       user_dir: priv_dir,
       key_cb: GitWerkGuts.SshKeyAuthentication,
-      auth_methods: 'publickey'
+      auth_methods: 'publickey',
+      shell: &on_shell/2
 
     {:noreply, %{state| ssh_pid: ssh_pid}}
   end
 
+  def on_shell(username, peer_address) do
+    Logger.debug "new user connected with username #{username} and address #{inspect peer_address}"
+    spawn_link fn ->
+      IO.puts "Hi #{username}! You've successfully authenticated, but GitWerk does not provide shell access."
+    end
+  end
 end
