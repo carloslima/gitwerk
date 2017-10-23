@@ -32,8 +32,10 @@ defmodule GitWerkGuts.SshServer do
     port = ssh_server_opts[:port] || 0
     {:ok, ssh_pid} = :ssh.daemon port, system_dir: priv_dir,
       user_dir: priv_dir,
-      key_cb: GitWerkGuts.SshKeyAuthentication
+      key_cb: GitWerkGuts.SshKeyAuthentication,
+      auth_methods: 'publickey'
 
     {:noreply, %{state| ssh_pid: ssh_pid}}
   end
+
 end
