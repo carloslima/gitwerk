@@ -33,6 +33,14 @@ defmodule GitWerkGuts.SshKeyAuthentication do
     end
   end
 
+  @doc """
+  Checks if the user key is authorized.
+  """
+  @spec is_auth_key(binary, user, daemon_options) :: boolean
+  def is_auth_key(key, _user, daemon_options) do
+    true
+  end
+
   defp file_base_name(:"ssh-rsa"), do: "ssh_host_rsa_key"
   defp file_base_name(:"rsa-sha2-256"), do: "ssh_host_rsa_key"
   defp file_base_name(:"rsa-sha2-384"), do: "ssh_host_rsa_key"

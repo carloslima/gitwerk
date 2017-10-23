@@ -30,7 +30,9 @@ defmodule GitWerkGuts.SshServer do
     ssh_server_opts = Application.get_env(:git_werk, __MODULE__)
     priv_dir = String.to_charlist(ssh_server_opts[:system_dir])
     port = ssh_server_opts[:port] || 0
-    {:ok, ssh_pid} = :ssh.daemon port, [system_dir: priv_dir, user_dir: priv_dir]
+    {:ok, ssh_pid} = :ssh.daemon port, system_dir: priv_dir,
+      user_dir: priv_dir,
+      key_cb: GitWerkGuts.SshKeyAuthentication
 
     {:noreply, %{state| ssh_pid: ssh_pid}}
   end
