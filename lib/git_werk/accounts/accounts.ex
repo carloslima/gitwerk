@@ -37,9 +37,22 @@ defmodule GitWerk.Accounts do
   """
   def get_user!(id), do: Repo.get!(User, id)
 
+  @doc """
+  Gets user by different keys
+  """
   def get_user_by(key_id: key_id) do
     (from k in UserKey,
     where: k.id == ^key_id,
+    preload: [:user])
+    |> Repo.one
+    |> Kernel.||(%{})
+    |> Map.get(:user)
+  end
+
+
+  def get_user_by(key: key) do
+    (from k in UserKey,
+    where: k.key == ^key,
     preload: [:user])
     |> Repo.one
     |> Kernel.||(%{})
@@ -154,5 +167,11 @@ defmodule GitWerk.Accounts do
     key
     |> UserKey.key_is_used_ch
     |> Repo.update
+  end
+
+  @doc """
+  """
+  def get_key_by(key: pub_key) do
+    Repo.get_by(UserKey, %{key: pub_key})
   end
 end

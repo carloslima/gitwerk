@@ -37,7 +37,7 @@ defmodule GitWerkGuts.SshTest do
       {:ok, cmd} = Ssh.parse_command("git-receive-pack '/#{user.username}/#{repo.name}.git'")
       assert Ssh.is_allowed?(cmd, user_key.id)
 
-      full_cmd = Ssh.get_git_command("git-upload-pack '/#{user.username}/#{repo.name}.git'", user_key.id)
+      {:ok, full_cmd} = Ssh.get_git_command("git-upload-pack '/#{user.username}/#{repo.name}.git'", user_key.id)
       conf = Application.get_env(:git_werk, GitWerk.Projects.Git)
       assert full_cmd == "git-upload-pack #{conf[:git_home_dir]}/#{user.username}/#{repo.name}.git"
     end

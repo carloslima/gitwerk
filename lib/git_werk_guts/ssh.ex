@@ -41,12 +41,20 @@ defmodule GitWerkGuts.Ssh do
   Checks if user by given key_id is allowed to access
   to request repo
   """
-  def is_allowed?(%SshCommand{} = cmd, key_id) do
-    with current_user when not is_nil(current_user) <- Accounts.get_user_by(key_id: key_id),
-         user when not is_nil(user) <- Accounts.get_user_by(%{username: cmd.username}),
+  def is_allowed?(%SshCommand{} = cmd, %Accounts.User{} = current_user) do
+    with user when not is_nil(user) <- Accounts.get_user_by(%{username: cmd.username}),
          repo when not is_nil(repo) <- Projects.get_repository_by(%{user_id: user.id, name: cmd.repository}),
          action when not is_nil(action) <- Map.get(@commands_to_action, cmd.command),
          :ok <- Authorization.can?(current_user, action, repo) do
+           true
+    else
+      _ -> false
+    end
+
+  end
+  def is_allowed?(%SshCommand{} = cmd, key_id) do
+    with current_user when not is_nil(current_user) <- Accounts.get_user_by(key_id: key_id),
+         true <- is_allowed?(cmd, current_user) do
            true
     else
       _ -> false
@@ -57,13 +65,14 @@ defmodule GitWerkGuts.Ssh do
   Returns full command that we can run to
   interact with git client
   """
-  def get_git_command(command, key_id) do
+  def get_git_command(command, current_user) do
     with {:ok, cmd} <- parse_command(command),
-         true <- is_allowed?(cmd, key_id),
+         true <- is_allowed?(cmd, current_user),
          {:ok, repo_full_path} <- find_repo_full_path(cmd.username, cmd.repository) do
-           "#{cmd.command} #{repo_full_path}"
+           {:ok, "#{cmd.command} #{repo_full_path}"}
     else
-      _ -> ""
+      {:error, _} = err -> err
+      reason -> {:error, reason}
     end
   end
 
