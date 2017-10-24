@@ -32,7 +32,7 @@ defmodule GitWerkGuts.GitCli do
   end
 
   @doc false
-  def handle_ssh_msg({:ssh_cm, cm, {:exec, _channel_id, want_reply, cmd}}, state) do
+  def handle_ssh_msg({:ssh_cm, cm, {:exec, channel_id, want_reply, cmd}}, state) do
     port = with {:ok, session} <- GitWerkGuts.SshSession.get(cm),
          {:ok, command} <- GitWerkGuts.Ssh.get_git_command(to_string(cmd), session.user) do
           [command, arg01] = String.split(command)
@@ -41,6 +41,7 @@ defmodule GitWerkGuts.GitCli do
           Port.open({:spawn_executable, git_cmd}, opts)
     else
       oth ->
+        :ssh_connection.send(cm, channel_id, 0, "Invalid command: '#{cmd}'\n")
         Logger.debug "Failed to exec #{inspect cmd} on git server, error: #{inspect oth}"
         close_ssh_connection(state, :invalid_command)
     end
@@ -64,8 +65,13 @@ defmodule GitWerkGuts.GitCli do
     {:ok, state}
   end
 
-  def handle_ssh_msg({:ssh_cm, _cm, {:pty, _channel_id, _, _}}, state) do
-    close_ssh_connection(state, :no_pty)
+  def handle_ssh_msg({:ssh_cm, cm, {:pty, channel_id, _, _}}, state) do
+    username = case  GitWerkGuts.SshSession.get(cm) do
+      {:ok, session} -> session.user.username
+      _ -> ""
+    end
+    message = "Hi #{username}! You've successfully authenticated, but GitWerk does not provide shell access.\r\n"
+    :ssh_connection.send(cm, channel_id, 1, message)
     {:ok, state}
   end
 
