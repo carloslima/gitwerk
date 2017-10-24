@@ -35,7 +35,8 @@ defmodule GitWerkGuts.SshServer do
       user_dir: priv_dir,
       key_cb: GitWerkGuts.SshKeyAuthentication,
       auth_methods: 'publickey',
-      shell: &on_shell/2
+      shell: &on_shell/2,
+      ssh_cli: {GitWerkGuts.GitCli, []}
 
     {:noreply, %{state| ssh_pid: ssh_pid}}
   end
