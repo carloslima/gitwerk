@@ -2,6 +2,9 @@
 $roboto-font-path: '../assets/';
 
 // Materialize styles
+@import "components/color";
+$primary-color: color('grey', 'darken-4');
+
 @import "materialize";
 
 .toasts {

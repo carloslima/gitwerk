@@ -1,3 +1,33 @@
+{{#x-nav title="GitWerk" as |n|}}
+  <ul id="dropdown1" class="dropdown-content">
+    <li>
+        Signed in as {{#user-info as |u|}} {{u.username}} {{/user-info}}
+    </li>
+    <li>
+      <a onclick={{route-action "logout"}}>Logout</a>
+    </li>
+  </ul>
+  {{#n.desktop-menu}}
+    <li>
+      <a class="dropdown-button" data-activates="dropdown1">
+        {{#user-info as |u|}}
+            {{gravatar-image
+            email=u.email
+            title=u.email
+            size=18
+            defaultImage='retro'
+            }}<i class="material-icons right">arrow_drop_down</i>
+        {{/user-info}}
+      </a>
+    </li>
+  {{/n.desktop-menu}}
+  {{#n.side-nav}}
+    <li>
+      <a onclick={{route-action 'logout'}}>Logout</a>
+    </li>
+  {{/n.side-nav}}
+{{/x-nav}}
+
 <div class="container">
   <div class="row">
     <div class="col s12 m8 offset-m2">
