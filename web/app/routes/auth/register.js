@@ -6,7 +6,10 @@ export default Route.extend({
       this.get('currentModel').save()
       .then(() => {
         this.transitionTo('auth.login');
-      })
+      }).catch((resp) => {
+        const { errors } = resp;
+        this.get('flashMessages').danger(errors.mapBy('detail').join(', '));
+      });
     }
   },
   model() {

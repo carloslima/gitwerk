@@ -23,6 +23,10 @@ module.exports = function(environment) {
       routeIfAlreadyAuthenticated: "index",
       routeAfterAuthentication: "index"
     },
+    flashMessageDefaults: {
+      timeout: 3000,
+      extendedTimeout: 375
+    },
     APP: {
       host: 'http://localhost:4000',
       namespace: 'api/v1'
