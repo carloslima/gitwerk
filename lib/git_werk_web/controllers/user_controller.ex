@@ -22,4 +22,9 @@ defmodule GitWerkWeb.UserController do
     user = Accounts.get_user!(id)
     render(conn, "show.json-api", data: user)
   end
+
+  def current(conn, _) do
+    user = Guardian.Plug.current_resource(conn)
+    render(conn, "show.json-api", data: user)
+  end
 end

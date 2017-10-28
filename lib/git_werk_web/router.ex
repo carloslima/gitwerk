@@ -37,6 +37,7 @@ defmodule GitWerkWeb.Router do
   scope "/api/v1", GitWerkWeb do
     pipe_through [:api, :api_authenticated]
     resources "/repositories", RepositoryController, except: [:new]
+    get "/sessions/current", UserController, :current
     scope "/users/:user_slug", as: :user_setting do
       resources "/keys/", UserKeyController, as: :key, only: [:create, :index]
     end
