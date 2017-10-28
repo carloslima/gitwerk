@@ -1,0 +1,38 @@
+{{#x-card
+  onsubmit=attrs.onsubmit
+  title='Register with GitWerk'
+  buttonText='Register'
+  buttonDisabled=validations.messages.length}}
+  <div class="row">
+    {{x-input
+      value=model.username
+      errors=(v-get model 'username' 'messages')
+      classNames='col s12'
+      type='email'
+      label='Username'}}
+  </div>
+  <div class="row">
+    {{x-input
+      value=model.email
+      errors=(v-get model 'email' 'messages')
+      classNames='col s12'
+      type='email'
+      label='Email'}}
+  </div>
+  <div class="row">
+    {{x-input
+      value=model.password
+      errors=(v-get model 'password' 'messages')
+      classNames='col s12'
+      type='password'
+      label='Password'}}
+  </div>
+  <div class="row">
+    {{x-input
+      value=model.passwordConfirmation
+      errors=(v-get model 'passwordConfirmation' 'messages')
+      classNames='col s12'
+      type='password'
+      label='Confirm Password'}}
+  </div>
+{{/x-card}}

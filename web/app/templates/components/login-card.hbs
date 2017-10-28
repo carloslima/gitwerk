@@ -1,0 +1,23 @@
+{{#x-card
+  onsubmit=attrs.onsubmit
+  title='Login to GitWerk'
+  buttonText='Login'
+  buttonDisabled=validations.messages.length}}
+
+  <div class="row">
+    {{x-input
+      value=model.username
+      errors=validations.attrs.model.username.messages
+      classNames='col s12'
+      type='email'
+      label='Username'}}
+  </div>
+  <div class="row">
+    {{x-input
+      value=model.password
+      errors=validations.attrs.model.password.messages
+      classNames='col s12'
+      type='password'
+      label='Password'}}
+  </div>
+{{/x-card}}

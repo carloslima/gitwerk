@@ -10,7 +10,7 @@ defmodule GitWerkWeb.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json", "json-api"]
   end
 
 
@@ -27,7 +27,7 @@ defmodule GitWerkWeb.Router do
 
   scope "/api/v1", GitWerkWeb do
     pipe_through [:api, :api_optional_auth]
-    resources "/sessions", SessionController, except: [:new, :delete]
+    resources "/sessions", SessionController, only: [:create]
     resources "/users", UserController, param: "slug", only: [:create, :show] do
       resources "/repositories", RepositoryController, param: "slug", only: [:show] do
         get "/code/file-list/:commit/*path", CodeController, :file_list

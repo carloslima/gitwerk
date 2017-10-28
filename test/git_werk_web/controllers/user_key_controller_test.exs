@@ -23,7 +23,7 @@ defmodule GitWerkWeb.UserKeyControllerTest do
     test "adds invalid ssh key", %{conn: conn, user: user} do
       conn = post conn, user_setting_key_path(conn, :create, user.username), key: @invalid_attrs
       res =  json_response(conn, :unprocessable_entity)
-      assert Enum.count(res["errors"]) == 3, "there should be 3 invalid data"
+      assert Enum.count(res["errors"]) == 4, "there should be 3 invalid data"
     end
 
     test "is not allowed to create key for others", %{conn: conn} do
