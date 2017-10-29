@@ -37,6 +37,7 @@ before_install:
 install:
   - cd web
   - travis_retry npm install
+  - travis_retry bower install
   - cd ../
   - mix local.hex --force
   - mix local.rebar --force
