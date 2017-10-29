@@ -8,9 +8,11 @@ cache:
   directories:
     - sysconfcpus
     - deps
+    - $HOME/.npm
 
 addons:
   - postgresql: "9.5"
+  - chrome: stable
   - apt:
     packages:
       - libssh2-1-dev
@@ -24,10 +26,12 @@ env:
   global:
     - LIBGIT2=~/libgit2/_install/
     - LD_LIBRARY_PATH=~/libgit2/_install/lib
+    - JOBS=1
 
 before_install:
   - "./test/scripts/travisbuild.sh"
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - npm config set spin false
 
 install:
   - cd web
@@ -41,5 +45,5 @@ before_script:
   - cp config/travis.exs config/test.exs
 script:
   - mix test
-  - cd assets/elm-app
+  - cd web
   - ember test
