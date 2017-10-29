@@ -9,6 +9,7 @@ cache:
     - sysconfcpus
     - deps
     - $HOME/.npm
+    - web/node_modules
 
 addons:
   - postgresql: "9.5"
@@ -32,6 +33,7 @@ before_install:
   - "./test/scripts/travisbuild.sh"
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - npm config set spin false
+  - npm install -g ember-cli
 
 install:
   - cd web
