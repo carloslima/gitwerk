@@ -13,7 +13,7 @@ export default Route.extend({
         'authenticator:gitwerk', user.username, user.password
       ).then(() => {
         this.get('flashMessages').success('Logged in!');
-      }).catch((response) => {
+      }).catch(() => {
         this.get('flashMessages')
         .danger('There was a problem with your username or password, please try again');
       })

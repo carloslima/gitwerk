@@ -1,18 +1,16 @@
 import Ember from 'ember';
 import config from '../config/environment';
 import fetch from 'ember-network/fetch';
-import GitWerkRoute from './basic';
 
+const { Route, inject } = Ember;
 
-
-const { inject } = Ember;
-
-export default GitWerkRoute.extend({
+export default Route.extend({
   session: inject.service(),
   beforeModel() {
     if(!this.get('session').get('isAuthenticated')) {
       this.transitionTo('auth.login');
     }
+    return this._super(...arguments);
   },
   afterModel() {
     return fetch(`${config.APP.host}/${config.APP.namespace}/sessions/current`, {
