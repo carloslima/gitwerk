@@ -23,10 +23,10 @@ defmodule GitWerkWeb.RepositoryController do
     end
   end
 
-  def show(conn, %{"user_slug" => _, "slug" => _}) do
+  def show(conn, _) do
     with repo when not is_nil(repo) <- conn.assigns.repository do
       conn
-      |> render("repository.json", repository: repo)
+      |> render("show.json-api", data: repo)
     else
       _ -> {:error, :not_found}
     end

@@ -6,12 +6,14 @@ otp_release: 20.1
 
 cache:
   directories:
-    - tests/elm-stuff/build-artifacts
     - sysconfcpus
     - deps
+    - $HOME/.npm
+    - web/node_modules
 
 addons:
   - postgresql: "9.5"
+  - chrome: stable
   - apt:
     packages:
       - libssh2-1-dev
@@ -25,35 +27,18 @@ env:
   global:
     - LIBGIT2=~/libgit2/_install/
     - LD_LIBRARY_PATH=~/libgit2/_install/lib
-  matrix:
-    - ELM_VERSION=0.18.0 TARGET_NODE_VERSION=node
+    - JOBS=1
 
 before_install:
   - "./test/scripts/travisbuild.sh"
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-  - | # epic build time improvement - see https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
-    if [ ! -d sysconfcpus/bin ];
-    then
-      git clone https://github.com/obmarg/libsysconfcpus.git;
-      cd libsysconfcpus;
-      ./configure --prefix=$TRAVIS_BUILD_DIR/sysconfcpus;
-      make && make install;
-      cd ..;
-    fi
+  - npm config set spin false
+
 install:
-  - nvm install $TARGET_NODE_VERSION
-  - nvm use $TARGET_NODE_VERSION
-  - node --version
-  - npm --version
-  - npm install -g elm-use elm-test@0.18.3
-  - npm install create-elm-app -g
-  - elm-use $ELM_VERSION
-  - mv $(npm config get prefix)/bin/elm-make $(npm config get prefix)/bin/elm-make-old
-  - printf '%s\n\n' '#!/bin/bash' 'echo "Running elm-make with sysconfcpus -n 2"' '$TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make-old "$@"' > $(npm config get prefix)/bin/elm-make
-  - chmod +x $(npm config get prefix)/bin/elm-make
-  - cd assets/elm-app
-  - travis_retry elm-package install --yes
-  - cd ../../
+  - cd web
+  - travis_retry npm install
+  - travis_retry bower install
+  - cd ../
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get
@@ -62,5 +47,5 @@ before_script:
   - cp config/travis.exs config/test.exs
 script:
   - mix test
-  #- cd assets/elm-app
-  #- elm-app test
+  - cd web
+  - ./node_modules/ember-cli/bin/ember test

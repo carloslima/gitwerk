@@ -46,6 +46,7 @@ defmodule GitWerk.Mixfile do
       {:gixir, github: "slashmili/gixir"},
       {:timex_ecto, "~> 3.1"},
       {:cors_plug, "~> 1.4"},
+      {:ja_serializer, "~> 0.12.0"},
 
       {:ex_guard, "~> 1.3"},
       {:ex_unit_notifier, "~> 0.1", only: :test},

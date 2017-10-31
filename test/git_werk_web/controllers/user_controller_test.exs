@@ -16,18 +16,20 @@ defmodule GitWerkWeb.UserControllerTest do
   end
 
   test "creates user and renders user when data is valid", %{conn: conn} do
-    conn = post conn, user_path(conn, :create), user: @create_attrs
+    user_req =%{data: %{type: "users", attributes: @create_attrs}}
+    conn = post conn, user_path(conn, :create), user_req
     new_user = json_response(conn, 201)
-    assert %{"id" => id} = new_user
-    assert new_user["jwt_token"]
+    assert %{"data" => %{"id" => id}} = new_user
+    assert new_user["data"]["attributes"]
 
     conn = get conn, user_path(conn, :show, id)
     user = json_response(conn, 200)
-    assert %{"id" => ^id} = user
+    assert %{"data" => %{"id" => ^id}} = user
   end
 
   test "does not create user and renders errors when data is invalid", %{conn: conn} do
-    conn = post conn, user_path(conn, :create), user: @invalid_attrs
+    user_req =%{data: %{type: "users", attributes: @invalid_attrs}}
+    conn = post conn, user_path(conn, :create), user_req
     assert json_response(conn, 422)["errors"] != %{}
   end
 end

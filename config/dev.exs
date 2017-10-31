@@ -10,9 +10,7 @@ config :git_werk, GitWerkWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false,
-  watchers: [node: ["node_modules/brunch/bin/brunch", "watch", "--stdin",
-                    cd: Path.expand("../assets", __DIR__)]]
+  check_origin: false
 
 # ## SSL Support
 #
@@ -64,7 +62,7 @@ config :git_werk, GitWerkGuts.SshAuthorizedKeys,
   authorized_keys_file: Path.join([Path.expand("."), "priv", "dev", ".ssh", "authorized_keys2"])
 
 config :cors_plug,
-  origin: ["http://localhost:3000"]
+  origin: ["http://localhost:4200"]
 
 config :git_werk, GitWerkGuts.SshServer,
   system_dir: Path.join([Path.expand("."), "priv/dev/ssh_keys/"]),

@@ -14,6 +14,7 @@ defmodule GitWerkWeb.ChangesetView do
   def render("errors.json", %{changeset: changeset}) do
     # When encoded, the changeset returns its errors
     # as a JSON object. So we just pass it forward.
-    %{errors: translate_errors(changeset)}
+    #%{errors: translate_errors(changeset)}
+    JaSerializer.EctoErrorSerializer.format(changeset)
   end
 end
