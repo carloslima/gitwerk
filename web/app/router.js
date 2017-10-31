@@ -12,7 +12,7 @@ Router.map(function() {
     this.route('register');
   });
   this.route('settings');
-  this.route('repo', { path: '/:owner/:name'}, function() {
+  this.route('repository', { path: '/:owner/:name'}, function() {
     this.route('index', { path: '/' });
   });
 });

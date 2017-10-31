@@ -27,7 +27,7 @@ defmodule GitWerkWeb.RepositoryControllerTest do
       |> conn_with_auth(user)
       |> post(repository_path(conn, :create), [repository: %{name: "my-repo", privacy: :public}])
 
-    assert %{"id" => _} = json_response(conn, 201)
+    assert %{"data" => %{"id" => _}} = json_response(conn, 201)
   end
 
   test "doesn't allow two repo with same name", %{conn: conn} do
@@ -37,7 +37,7 @@ defmodule GitWerkWeb.RepositoryControllerTest do
       |> conn_with_auth(user)
       |> post(repository_path(conn, :create), [repository: %{name: "my-repo", privacy: :public}])
 
-    assert %{"id" => _} = json_response(first_conn, 201)
+    assert %{"data" => %{"id" => _}} = json_response(first_conn, 201)
 
     sec_conn =
       conn
@@ -51,14 +51,14 @@ defmodule GitWerkWeb.RepositoryControllerTest do
     user = user_fixture()
     repository = repository_fixture(user_id: user.id)
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_path(conn, :show, user.username, repository.name)
-    assert %{"id" => _} = json_response(conn, 200)
+    conn = get conn, repository_path(conn, :show, "#{user.username}/#{repository.name}")
+    assert %{"data" => %{"id" => _}} = json_response(conn, 200)
   end
 
   test "gets a repository that is private without auth", %{conn: conn} do
     user = user_fixture()
     repository = repository_fixture(user_id: user.id, privacy: :private)
-    conn = get conn, user_repository_path(conn, :show, user.username, repository.name)
+    conn = get conn, repository_path(conn, :show, "#{user.username}/#{repository.name}")
     assert json_response(conn, 404)
   end
 
@@ -67,7 +67,7 @@ defmodule GitWerkWeb.RepositoryControllerTest do
     user = user_fixture()
     repository = repository_fixture(user_id: user.id, privacy: :private)
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_path(conn, :show, user.username, repository.name)
-    assert %{"id" => _} = json_response(conn, 200)
+    conn = get conn, repository_path(conn, :show, "#{user.username}/#{repository.name}")
+    assert %{"data" => %{"id" => _}} = json_response(conn, 200)
   end
 end

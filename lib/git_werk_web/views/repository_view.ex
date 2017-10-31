@@ -1,17 +1,18 @@
 defmodule GitWerkWeb.RepositoryView do
   use GitWerkWeb, :view
-  alias GitWerkWeb.RepositoryView
+  use JaSerializer.PhoenixView
 
-  def render("index.json", %{repositories: repositories}) do
-    render_many(repositories, RepositoryView, "repository.json")
+  attributes [:name, :privacy, :namespace, :slug, :permissions]
+
+  def permissions(_repo, _conn) do
+      [:read]
   end
 
-  def render("repository.json", %{repository: repository}) do
-    %{
-      id: repository.id,
-      name: repository.name,
-      namespace: repository.user.username,
-      privacy: repository.privacy,
-    }
+  def slug(repo, _) do
+    "#{repo.user.username}/#{repo.name}"
+  end
+
+  def namespace(repo, _) do
+    repo.user.username
   end
 end

@@ -15,8 +15,7 @@ defmodule GitWerkWeb.LoadRepositoryPlug do
 
   @doc false
   def call(conn, _) do
-    username = conn.params["user_slug"] || ""
-    repository_name = conn.params["repository_slug"] || conn.params["slug"]  || ""
+    [username, repository_name ]= String.split(conn.params["id"] || "/", "/")
     auth_user = Accounts.get_current_user(conn)
     with user when not is_nil(user) <- Accounts.get_user_by(%{username: username}),
          repo when not is_nil(repo) <- Projects.get_repository_by(%{user_id: user.id, name: repository_name}),
