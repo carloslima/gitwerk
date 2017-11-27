@@ -25,9 +25,8 @@ os:
 
 env:
   global:
-    - LIBGIT2=~/libgit2/_install/
-    - LD_LIBRARY_PATH=~/libgit2/_install/lib
     - JOBS=1
+    - PATH=$HOME/.cargo/bin:$PATH
 
 before_install:
   - "./test/scripts/travisbuild.sh"
