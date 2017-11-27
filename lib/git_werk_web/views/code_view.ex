@@ -1,10 +1,12 @@
 defmodule GitWerkWeb.CodeView do
   use GitWerkWeb, :view
+  use JaSerializer.PhoenixView
 
-  def render("file_list.json", %{file_list: file_list}) do
-    file_list
-    |> Enum.map(fn f ->
-      %{name: f.name, type: f.type}
-    end)
+  attributes [:name, :id, :entry_type]
+
+  def entry_type(x, _), do: x.type
+  def id(x, _) do
+    x.oid
   end
+  def type, do: "tree-entry"
 end

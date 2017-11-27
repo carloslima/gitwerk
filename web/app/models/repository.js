@@ -1,5 +1,6 @@
 import DS from 'ember-data';
 import attr from 'ember-data/attr';
+import { computed } from '@ember/object';
 
 const Repository = DS.Model.extend({
   slug: attr(),
@@ -7,6 +8,12 @@ const Repository = DS.Model.extend({
   namespace: attr(),
   privacy: attr(),
   permissions: attr(),
+  trees: DS.hasMany('tree', {async: true}),
+
+  defaultTree: computed(function () {
+    let defaultTree = this.get('trees').filter(tree => tree.id == 'master');
+    return defaultTree[0];
+  }),
 });
 
 Repository.reopenClass({

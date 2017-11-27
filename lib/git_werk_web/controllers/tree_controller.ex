@@ -1,4 +1,4 @@
-defmodule GitWerkWeb.CodeController do
+defmodule GitWerkWeb.TreeController do
   use GitWerkWeb, :controller
   require Logger
 
@@ -8,22 +8,15 @@ defmodule GitWerkWeb.CodeController do
 
   alias GitWerk.Projects
 
-  def entries(conn, params) do
-    file_list(conn, params)
-  end
-  def file_list(conn, params) do
-    path = if params["path"] == [] do
-      ""
-    else
-      Path.join(params["path"])
-    end
+  def show(conn, params) do
+    path = ""
     with {:ok, file_list} <- Projects.list_repository_files(conn.assigns.repository, params["tree_id"], path) do
-      render(conn, "index.json-api", data: file_list)
+      tree = %{id: params["tree_id"], name: params["tree_id"], tree_entries: file_list, type: "tree"}
+      render(conn, "index.json-api", data: tree)
     else
       error ->
         Logger.warn "failed to fetch the file list with error : #{inspect error}"
         {:error, :not_found}
     end
-
   end
 end

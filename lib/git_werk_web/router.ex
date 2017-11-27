@@ -28,7 +28,9 @@ defmodule GitWerkWeb.Router do
   scope "/api/v1", GitWerkWeb do
     pipe_through [:api, :api_optional_auth]
     resources "/repositories", RepositoryController, only: [:show] do
-        get "/code/file-list/:commit/*path", CodeController, :file_list
+      get "/code/file-list/:commit/*path", CodeController, :file_list
+      get "/trees/:tree_id/", TreeController, :show
+      get "/trees/:tree_id/entries/*path", CodeController, :entries
     end
     resources "/sessions", SessionController, only: [:create]
     resources "/users", UserController, only: [:create, :show]

@@ -12,8 +12,10 @@ Router.map(function() {
     this.route('register');
   });
   this.route('settings');
-  this.route('repository', { path: '/:owner/:name'}, function() {
+  this.route('repository', { path: '/:namespace/:name'}, function() {
     this.route('index', { path: '/' });
+    this.route('tree', { path: '/tree/:tree_id'}, function() { });
+    this.route('tree', { path: '/tree/:tree_id/*tree_path'}, function() { });
   });
 });
 

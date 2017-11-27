@@ -1,0 +1,8 @@
+<h4>List items in tree</h4>
+<br />
+TREEID: {{model.id}}
+<br />
+{{#each model.treeEntries as |te|}}
+    {{te.name}} ({{te.entryType}})<br />
+
+{{/each}}

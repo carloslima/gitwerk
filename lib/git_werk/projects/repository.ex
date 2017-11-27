@@ -16,6 +16,7 @@ defmodule GitWerk.Projects.Repository do
     belongs_to :user, User
 
     field :repo, :any, virtual: true
+    field :trees, :string, virtual: true
     timestamps()
   end
 
