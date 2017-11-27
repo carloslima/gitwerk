@@ -48,5 +48,5 @@ before_script:
   - cp config/travis.exs config/test.exs
 script:
   - mix test
-  - cd web
-  - ./node_modules/ember-cli/bin/ember test
+  #- cd web
+  #- ./node_modules/ember-cli/bin/ember test
