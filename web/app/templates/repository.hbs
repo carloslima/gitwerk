@@ -1,1 +1,24 @@
+{{model.namespace}}/{{model.name}}
+<br />
+{{#each model.trees as |t|}}
+    branch type: {{t.treeType}}
+{{/each}}
+
+{{#if isRepoHomePage}}
+    <h4>List of files in repo home page</h4>
+    <br />
+    isExpanded: {{isRepoHomePage}}
+    <br />
+    <p>files</p>
+    {{#each model.defaultTree.treeEntries as |te|}}
+        {{#if te.isTree}}
+            t:
+            {{#link-to "repository.tree.index" model model.defaultTree.id te.name}} {{te.name}} ({{te.entryType}}){{/link-to}}
+            {{else }}
+                {{te.name}} ({{te.entryType}})
+            {{/if}}
+            <br />
+        {{/each}}
+
+{{/if}}
 {{outlet}}

@@ -12,25 +12,25 @@ defmodule GitWerkWeb.CodeControllerTest do
   test "get list of files in a repository", %{conn: conn, user: user, project: project} do
     commit_files(user.username, project.name)
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_code_path(conn, :file_list, user.username, project.name, "master", [])
+    conn = get conn, repository_code_path(conn, :file_list, project.id, "master", [])
     file_list = json_response(conn, 200)
     assert file_list
-    assert length(file_list) == 2
+    assert length(file_list["data"]) == 2
   end
 
 
   test "get list of files in a sub dir in a repository", %{conn: conn, user: user, project: project} do
     commit_files(user.username, project.name)
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_code_path(conn, :file_list, user.username, project.name, "master", ["src"])
+    conn = get conn, repository_code_path(conn, :file_list, project.id, "master", ["src"])
     file_list = json_response(conn, 200)
-    assert file_list == [%{"name" => "code.src", "type" => "blob"}]
-    assert length(file_list) == 1
+    assert  %{"data" =>[%{"attributes" => %{"entry-type" => "blob", "name" => "code.src"} }]} = file_list
+    assert length(file_list["data"]) == 1
   end
 
   test "returns 404 when repo is empty or face an error", %{conn: conn, user: user, project: project} do
     conn = conn_with_auth(conn, user)
-    conn = get conn, user_repository_code_path(conn, :file_list, user.username, project.name, "master", [])
+    conn = get conn, repository_code_path(conn, :file_list, "#{user.username}/#{project.name}", "master", [])
     assert json_response(conn, 404)
   end
 

@@ -18,7 +18,7 @@ defmodule GitWerkWeb.UserController do
     end
   end
 
-  def show(conn, %{"slug" => id}) do
+  def show(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
     render(conn, "show.json-api", data: user)
   end
