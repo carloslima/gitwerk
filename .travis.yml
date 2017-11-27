@@ -33,6 +33,9 @@ before_install:
   - "./test/scripts/travisbuild.sh"
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - npm config set spin false
+  - curl -sSf https://build.travis-ci.org/files/rustup-init.sh | sh -s -- --default-toolchain=1.19.0 -y
+  - rustc --version
+  - cargo --version
 
 install:
   - travis_retry npm install -g bower
