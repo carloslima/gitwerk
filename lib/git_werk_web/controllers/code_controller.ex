@@ -12,11 +12,7 @@ defmodule GitWerkWeb.CodeController do
     file_list(conn, params)
   end
   def file_list(conn, params) do
-    path = if params["path"] == [] do
-      ""
-    else
-      Path.join(params["path"])
-    end
+    path = if params["path"] == [], do: "", else: Path.join(params["path"])
     with {:ok, file_list} <- Projects.list_repository_files(conn.assigns.repository, params["tree_id"], path) do
       render(conn, "index.json-api", data: file_list)
     else
