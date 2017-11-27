@@ -35,6 +35,7 @@ before_install:
   - npm config set spin false
 
 install:
+  - travis_retry npm install -g bower
   - cd web
   - travis_retry npm install
   - travis_retry bower install
