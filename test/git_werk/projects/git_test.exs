@@ -14,8 +14,7 @@ defmodule GitWerk.GitTest do
     {:ok, file_list} = Git.ls_files(git, "master", "src")
     assert length(file_list) == 1
 
-    {:error, {_, detail}} = Git.ls_files(git, "master", "somewher")
-    assert detail =~ "does not exist"
+    assert {:error, _} = Git.ls_files(git, "master", "somewher")
   end
 
 
