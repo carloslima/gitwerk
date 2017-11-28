@@ -11,8 +11,8 @@ services:
       build: .
       ports:
         - "4000:4000"
-        - "3000:3000"
-        - "2222:22"
+        - "4200:4200"
+        - "8989:8989"
       volumes:
       - .:/home/git/gitwerk
       links:

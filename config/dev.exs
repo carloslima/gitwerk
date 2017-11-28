@@ -10,7 +10,9 @@ config :git_werk, GitWerkWeb.Endpoint,
   http: [port: 4000],
   debug_errors: true,
   code_reloader: true,
-  check_origin: false
+  check_origin: false,
+  watchers: [node: ["node_modules/ember-cli/bin/ember", "serve", "--watcher=watchman",
+                    cd: Path.expand("../web", __DIR__)]]
 
 # ## SSL Support
 #
