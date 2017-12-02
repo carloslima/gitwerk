@@ -25,14 +25,16 @@ os:
 
 env:
   global:
-    - LIBGIT2=~/libgit2/_install/
-    - LD_LIBRARY_PATH=~/libgit2/_install/lib
     - JOBS=1
+    - PATH=$HOME/.cargo/bin:$PATH
 
 before_install:
   - "./test/scripts/travisbuild.sh"
   - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - npm config set spin false
+  - curl -sSf https://build.travis-ci.org/files/rustup-init.sh | sh -s -- --default-toolchain=1.19.0 -y
+  - rustc --version
+  - cargo --version
 
 install:
   - travis_retry npm install -g bower

@@ -7,8 +7,8 @@ rm -rf /home/git/.ssh/authorized_keys2
 ln -s /home/git/gitwerk/priv/dev/.ssh/authorized_keys2 /home/git/.ssh/authorized_keys2
 rm -rf /home/git/repositories
 ln -s /home/git/gitwerk/priv/dev/repositories /home/git/repositories
-sudo /usr/sbin/sshd -D &
-cd assets/elm-app
-/node_modules/.bin/elm-app start &
-cd ../../
-iex --sname gitwerk_srv -S mix phx.server
+cd web
+npm install
+cd ..
+mix deps.get
+iex -S mix phx.server
