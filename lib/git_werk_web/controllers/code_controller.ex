@@ -13,6 +13,7 @@ defmodule GitWerkWeb.CodeController do
   end
   def file_list(conn, params) do
     path = params["path"] || ""
+    conn = assign(conn, :tree_path, path)
     with {:ok, file_list} <- Projects.list_repository_files(conn.assigns.repository, params["tree_id"], path) do
       render(conn, "index.json-api", data: file_list)
     else

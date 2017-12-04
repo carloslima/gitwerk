@@ -32,6 +32,7 @@ defmodule GitWerkWeb.Router do
       get "/trees/:tree_id/", TreeController, :show
       get "/trees/:tree_id/entries", CodeController, :entries
     end
+    get "/trees/", TreeController, :show
     resources "/sessions", SessionController, only: [:create]
     resources "/users", UserController, only: [:create, :show]
   end
